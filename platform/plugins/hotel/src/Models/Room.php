@@ -89,6 +89,14 @@ class Room extends BaseModel
     }
 
     /**
+     * @return BelongsToMany
+     */
+    public function roomDatesTwo(): BelongsToMany
+    {
+        return $this->belongsToMany(RoomDate::class, 'ht_rooms_amenities', 'room_id', 'amenity_id');
+    }
+
+    /**
      * @return BelongsTo
      */
     public function currency(): BelongsTo
