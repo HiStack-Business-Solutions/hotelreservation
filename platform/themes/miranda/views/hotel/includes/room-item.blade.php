@@ -15,19 +15,31 @@
         <h4 class="title"><a href="{{ $room->url }}">{{ $room->name }}</a></h4>
         <p class="mb-10"><a>Room Available : </a>
     <a href="{{ $room->url }}">
-        @php
-            $startDate = \Carbon\Carbon::createFromFormat('d-m-Y', request()->query('start_date', now()->format('d-m-Y')))->format('Y-m-d');
-            $endDate = \Carbon\Carbon::createFromFormat('d-m-Y', request()->query('end_date', now()->addDay()->format('d-m-Y')))->format('Y-m-d');
+    @php
+        use Carbon\Carbon;
 
-            $filteredDates = $room->roomDatesTwo->filter(function ($item) use ($room, $startDate, $endDate) {
-                $itemStartDate = \Carbon\Carbon::parse($item['start_date'])->format('Y-m-d');
-                $itemEndDate = \Carbon\Carbon::parse($item['end_date'])->format('Y-m-d');
-                
-                return $item['room_id'] == $room->id &&
-                    $itemStartDate >= $startDate &&
-                    $itemEndDate <= $endDate;
-            })->take(7);
-        @endphp
+        try {
+            $startDate = Carbon::createFromFormat('d-m-Y', request()->query('start_date', now()->format('d-m-Y')))->format('Y-m-d');
+            $endDate = Carbon::createFromFormat('d-m-Y', request()->query('end_date', now()->addDay()->format('d-m-Y')))->format('Y-m-d');
+        } catch (\Exception $e) {
+            $startDate = now()->format('Y-m-d');
+            $endDate = now()->addDay()->format('Y-m-d');
+        }
+
+        $filteredDates = $room->roomDatesTwo->filter(function ($item) use ($room, $startDate, $endDate) {
+            try {
+                $itemStartDate = Carbon::parse($item['start_date'])->format('Y-m-d');
+                $itemEndDate = Carbon::parse($item['end_date'])->format('Y-m-d');
+            } catch (\Exception $e) {
+                return false;
+            }
+            
+            return $item['room_id'] == $room->id &&
+                $itemStartDate >= $startDate &&
+                $itemEndDate <= $endDate;
+        })->take(7);
+    @endphp
+
         @if ($filteredDates->isEmpty())
     {{ $room->number_of_rooms }}
 @else
