@@ -301,24 +301,42 @@ class PublicController extends Controller
         $endDate = Carbon::createFromFormat('d-m-Y', Arr::get($sessionData, 'end_date'));
         $nights = $endDate->diffInDays($startDate);
         $adults = Arr::get($sessionData, 'adults');
-
         $room = $roomRepository->getFirstBy(
             ['id' => Arr::get($sessionData, 'room_id')],
             ['*'],
             ['currency', 'category']
         );
-
         if (!$room) {
             abort(404);
         }
 
-        $taxAmount = $room->tax->percentage * $room->price / 100;
+        // dd(Arr::get($sessionData, 'start_date'));
+        $filteredRoomDates = $room->roomDatesTwo->filter(function($roomDate) use ($room, $sessionData) {
+            return $roomDate->room_id == $room['id'] && Carbon::parse($roomDate->start_date)->format('d-m-Y') == Arr::get($sessionData, 'start_date');
+        })->first();
 
-        $total = $room->price * $nights + $taxAmount;
-
-        $services = $serviceRepository->allBy(['status' => BaseStatusEnum::PUBLISHED]);
-
+        // dd($room);
+        if($filteredRoomDates != null){
+            $roomDate = $filteredRoomDates;
+            $room->price = $roomDate->price;
+            $taxAmount = $room->tax->percentage * $room->price / 100;
+            $total = $room->price * $nights;
+            $services = $serviceRepository->allBy(['status' => BaseStatusEnum::PUBLISHED]);
+            $discount = $roomDate['discount'];
+            if($discount > 0){
+                $total = strval($total * (1 - $discount / 100));
+                $taxAmount = $room->tax->percentage * $total / 100;
+                $total = $total + $taxAmount;
+            }
+        }
+        else{
+            $discount = 0;
+            $taxAmount = $room->tax->percentage * $room->price / 100;
+            $total = $room->price * $nights + $taxAmount;
+            $services = $serviceRepository->allBy(['status' => BaseStatusEnum::PUBLISHED]);
+        }
         return Theme::scope('hotel.booking', compact(
+                'discount',
                 'room',
                 'services',
                 'startDate',
@@ -359,20 +377,41 @@ class PublicController extends Controller
         BookingService $bookingService
     ) {
         $room = $roomRepository->findOrFail($request->input('room_id'));
-
         $booking = $bookingRepository->getModel();
         $booking->fill($request->input());
 
         $startDate = Carbon::createFromFormat('d-m-Y', $request->input('start_date'));
         $endDate = Carbon::createFromFormat('d-m-Y', $request->input('end_date'));
         $nights = $endDate->diffInDays($startDate);
+        // dd($booking);
 
-        $taxAmount = $room->tax->percentage * $room->price / 100;
+        // dd(Arr::get($sessionData, 'start_date'));
+        $filteredRoomDates = $room->roomDatesTwo->filter(function($roomDate) use ($room, $request) {
+            return $roomDate->room_id == $room['id'] && Carbon::parse($roomDate->start_date)->format('d-m-Y') == Arr::get($request, 'start_date');
+        })->first();
 
-        $booking->amount = $room->price * $nights + $taxAmount;
-        $booking->tax_amount = $taxAmount;
+        if($filteredRoomDates != null){
+            $roomDate = $filteredRoomDates;
+            $room->price = $roomDate->price;
+            $booking->tax_amount = $room->tax->percentage * $room->price / 100;
+            $booking->amount = $room->price * $nights;
+            $discount = $roomDate['discount'];
+            if($discount > 0){
+                $booking->amount = strval($booking->amount * (1 - $discount / 100));
+                $booking->tax_amount = $room->tax->percentage * $booking->amount / 100;
+                $booking->amount = $booking->amount + $booking->tax_amount;
+            }
+        }
+        else{
+            $discount = 0;
+            $booking->tax_amount = $room->tax->percentage * $room->price / 100;
+            $booking->amount = $room->price * $nights + $booking->tax_amount;
+        }
 
-        $booking->transaction_id = Str::upper(Str::random(32));
+        // $taxAmount = $room->tax->percentage * $room->price / 100;
+        // $booking->amount = $room->price * $nights + $taxAmount;
+        // $booking->tax_amount = $taxAmount;
+        $booking->transaction_id = Str::upper(Str::random(5));
 
         if ($request->input('services')) {
             $services = $serviceRepository->getModel()
@@ -385,7 +424,6 @@ class PublicController extends Controller
         }
 
         $booking = $bookingRepository->createOrUpdate($booking);
-
         if ($request->input('services')) {
             $booking->services()->attach($request->input('services'));
         }
@@ -507,10 +545,28 @@ class PublicController extends Controller
         $nights = $endDate->diffInDays($startDate);
 
         $room = $roomRepository->findOrFail($request->input('room_id'));
+        $filteredRoomDates = $room->roomDatesTwo->filter(function($roomDate) use ($room, $request) {
+            return $roomDate->room_id == $room['id'] && Carbon::parse($roomDate->start_date)->format('d-m-Y') == Arr::get($request, 'start_date');
+        })->first();
+        // dd($filteredRoomDates);
 
-        $taxAmount = $room->tax->percentage * $room->price / 100;
-
-        $amount = $room->price * $nights + $taxAmount;
+        if($filteredRoomDates != null){
+            $roomDate = $filteredRoomDates;
+            $room->price = $roomDate->price;
+            $taxAmount = $room->tax->percentage * $room->price / 100;
+            $amount = $room->price * $nights;
+            $discount = $roomDate['discount'];
+            if($discount > 0){
+                $amount = strval($amount * (1 - $discount / 100));
+                $taxAmount = $room->tax->percentage * $amount / 100;
+                $amount = $amount + $taxAmount;
+            }
+        }
+        else{
+            $discount = 0;
+            $taxAmount = $room->tax->percentage * $room->price / 100;
+            $amount = $room->price * $nights + $taxAmount;
+        }
 
         if ($request->input('services')) {
             $services = $serviceRepository->getModel()
@@ -519,6 +575,9 @@ class PublicController extends Controller
 
             foreach ($services as $service) {
                 $amount += $service->price;
+                // if($filteredRoomDates != null && $filteredRoomDates['discount'] > 0){
+                //     $amount = $amount * (1 - $discount / 100);
+                // }
             }
         }
 

@@ -33,6 +33,7 @@ class Booking extends BaseModel
         'payment_id',
         'transaction_id',
         'tax_amount',
+        'discount',
     ];
 
     /**

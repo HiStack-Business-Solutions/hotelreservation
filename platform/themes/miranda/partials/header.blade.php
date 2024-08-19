@@ -60,12 +60,15 @@
 
             <!-- Site Logo -->
             <div class="site-logo">
+            <!--
                 <a href="{{ url('/') }}" class="main-logo">
                     <img src="{{ RvMedia::getImageUrl(theme_option(url()->current() == url('') ? 'logo_white' : 'logo')) }}" alt="{{ theme_option('site_title') }}">
                 </a>
                 <a href="{{ url('/') }}" class="sticky-logo">
                     <img src="{{ RvMedia::getImageUrl(theme_option('logo')) }}" alt="{{ theme_option('site_title') }}">
                 </a>
+            -->
+            ECOPARK
             </div>
 
             <!-- Header Info Pushed To Menu Wrap -->

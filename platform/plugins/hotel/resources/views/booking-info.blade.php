@@ -37,7 +37,7 @@
             <th>{{ __('Name') }}</th>
             <th class="text-center">{{ __('Checkin Date') }}</th>
             <th class="text-center">{{ __('Checkout Date') }}</th>
-            <th class="text-center">{{ __('Number of rooms') }}</th>
+            <!-- <th class="text-center">{{ __('Number of rooms') }}</th> -->
             <th class="text-center">{{ __('Price') }}</th>
             <th class="text-center">{{ __('Tax') }}</th>
         </tr>
@@ -52,7 +52,7 @@
                 <td style="vertical-align: middle"><a href="{{ $booking->room->room->url }}" target="_blank">{{ $booking->room->room->name }}</a></td>
                 <td class="text-center" style="vertical-align: middle">{{ $booking->room->start_date }}</td>
                 <td class="text-center" style="vertical-align: middle">{{ $booking->room->end_date }}</td>
-                <td class="text-center" style="vertical-align: middle">{{ $booking->room->number_of_rooms }}</td>
+                <!-- <td class="text-center" style="vertical-align: middle">{{ $booking->room->number_of_rooms }}</td> -->
                 <td class="text-center" style="vertical-align: middle"><strong>{{ format_price($booking->room->price) }}</strong></td>
                 <td class="text-center" style="vertical-align: middle"><strong>{{ format_price($booking->tax_amount) }}</strong></td>
             </tr>
@@ -84,6 +84,7 @@
         <br>
     @endif
     <br>
+    <p><strong>{{ __('Discount') }}</strong>: <span class="text-danger">{{ $booking->discount}}% <i>(exclude Service)</i></span></p>
     <p><strong>{{ __('Total Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->amount) }}</span></p>
     <p><strong>{{ __('Payment method') }}</strong>: {{ $booking->payment->id ? $booking->payment->payment_channel->label() : 'N/A' }}</p>
 </div>

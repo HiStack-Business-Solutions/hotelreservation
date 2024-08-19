@@ -1,5 +1,7 @@
 <?php
 
+use Stripe\Discount;
+
 return [
     'name'                 => 'Bookings',
     'create'               => 'New booking',
@@ -22,6 +24,7 @@ return [
     'arrival_time'         => 'Arrival Time',
     'start_date'           => 'Start Date',
     'end_date'             => 'End Date',
+    'discount'             => 'Discount',
     'settings'             => [
         'email' => [
             'title'       => 'Booking',

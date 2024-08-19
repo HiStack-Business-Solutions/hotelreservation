@@ -65,8 +65,8 @@ return [
     'methods'                               => [
         'paypal'        => 'PayPal',
         'stripe'        => 'Stripe',
-        'cod'           => 'Thanh toán khi giao hàng (COD)',
-        'bank_transfer' => 'Chuyển khoản qua ngân hàng',
+        'full_payment'           => 'Thanh toán khi giao hàng (COD)',
+        'down_payment' => 'Chuyển khoản qua ngân hàng',
     ],
     'statuses'                              => [
         'pending'   => 'Chưa hoàn tất',

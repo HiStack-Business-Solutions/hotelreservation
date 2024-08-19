@@ -259,7 +259,7 @@
                         <tr class="paypal-online-payment payment-content-item hidden">
                             <td class="border-left" colspan="3">
                                 {!! Form::open() !!}
-                                {!! Form::hidden('type', 'cod', ['class' => 'payment_type']) !!}
+                                {!! Form::hidden('type', 'full_payment', ['class' => 'payment_type']) !!}
                                 <div class="col-sm-12">
                                     <div class="well bg-white">
                                         <div class="form-group">
@@ -300,7 +300,7 @@
                         <tr class="paypal-online-payment payment-content-item hidden">
                             <td class="border-left" colspan="3">
                                 {!! Form::open() !!}
-                                {!! Form::hidden('type', 'bank_transfer', ['class' => 'payment_type']) !!}
+                                {!! Form::hidden('type', 'down_payment', ['class' => 'payment_type']) !!}
                                 <div class="col-sm-12">
                                     <div class="well bg-white">
                                         <div class="form-group">
