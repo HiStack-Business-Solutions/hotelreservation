@@ -19,8 +19,14 @@
                     <div class="row">
                         <div class="col-md-6" v-show="form.active">
                             <div class="form-group">
-                                <label for="price-input">{{ trans('plugins/hotel::room.form.price') }}</label>
+                                <label for="price-input">Normal {{ trans('plugins/hotel::room.form.price') }}</label>
                                 <input type="number" id="price-input" v-model="form.price" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6" v-show="form.active">
+                            <div class="form-group">
+                                <label for="discount-input">{{ trans('plugins/hotel::room.form.discount') }}</label>
+                                <input type="number" id="discount-input" v-model="form.discount" class="form-control">
                             </div>
                         </div>
                         <div class="col-md-6" v-show="form.active">

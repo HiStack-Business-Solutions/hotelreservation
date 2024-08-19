@@ -11,7 +11,8 @@
                             <!-- Site Info Widget -->
                             <div class="widget site-info-widget mb-50">
                                 <div class="footer-logo mb-50">
-                                    <img src="{{ RvMedia::getImageUrl(theme_option('logo_white')) }}" alt="{{ theme_option('site_title') }}">
+                                    <!-- <img src="{{ RvMedia::getImageUrl(theme_option('logo_white')) }}" alt="{{ theme_option('site_title') }}"> -->
+                                     ECOPARK
                                 </div>
                                 <p>{{ theme_option('about-us') }}</p>
                                 <div class="social-links mt-40">

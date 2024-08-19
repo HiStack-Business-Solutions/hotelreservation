@@ -50,6 +50,7 @@ $(document).ready(function () {
             form: {
                 id: '',
                 price: '',
+                discount: '',
                 start_date: '',
                 end_date: '',
                 enable_person: 0,
@@ -61,6 +62,7 @@ $(document).ready(function () {
             formDefault: {
                 id: '',
                 price: '',
+                discount: '',
                 start_date: '',
                 end_date: '',
                 enable_person: 0,

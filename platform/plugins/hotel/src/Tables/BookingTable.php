@@ -94,6 +94,7 @@ class BookingTable extends TableAbstract
             'ht_bookings.amount',
             'ht_bookings.currency_id',
             'ht_bookings.payment_id',
+            'ht_bookings.discount',
         ];
 
         $query = $model
@@ -152,6 +153,12 @@ class BookingTable extends TableAbstract
             'status'      => [
                 'name'  => 'ht_bookings.status',
                 'title' => trans('core/base::tables.status'),
+                'width' => '100px',
+                'class' => 'text-left',
+            ],
+            'discount'      => [
+                'name'  => 'ht_bookings.discount',
+                'title' => trans('core/base::tables.discount'),
                 'width' => '100px',
                 'class' => 'text-left',
             ],

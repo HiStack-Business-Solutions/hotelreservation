@@ -14,8 +14,8 @@ class PaymentMethodEnum extends Enum
 {
     public const STRIPE = 'stripe';
     public const PAYPAL = 'paypal';
-    public const COD = 'cod';
-    public const BANK_TRANSFER = 'bank_transfer';
+    public const COD = 'full_payment';
+    public const BANK_TRANSFER = 'down_payment';
 
     /**
      * @var string

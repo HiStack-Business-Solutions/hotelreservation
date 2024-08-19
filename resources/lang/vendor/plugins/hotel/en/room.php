@@ -8,6 +8,7 @@ return [
     'amenities' => 'Amenities',
     'form'      => [
         'price'             => 'Price',
+        'discount'          => 'Discount',
         'currency'          => 'Currency',
         'max_children'      => 'Max children',
         'max_adults'        => 'Max adults',

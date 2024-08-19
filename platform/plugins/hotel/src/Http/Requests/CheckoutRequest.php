@@ -24,6 +24,7 @@ class CheckoutRequest extends Request
             'phone'            => 'required',
             'zip'              => 'max:10',
             'terms_conditions' => 'required',
+            'discount'          => 'required',
         ];
     }
 }

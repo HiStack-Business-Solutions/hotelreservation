@@ -88,6 +88,7 @@ class HotelCreateTable extends Migration
             $table->integer('customer_id')->unsigned()->nullable();
             $table->string('transaction_id', 32)->nullable();
             $table->string('status', 120)->default('pending');
+            $table->decimal('discount', 20, 0);
             $table->timestamps();
         });
 
@@ -130,6 +131,7 @@ class HotelCreateTable extends Migration
             $table->timestamp('start_date')->nullable();
             $table->timestamp('end_date')->nullable();
             $table->decimal('price', 15, 2)->nullable();
+            $table->decimal('discount', 10, 0)->nullable();
             $table->tinyInteger('max_guests')->nullable();
             $table->tinyInteger('active')->default(0)->nullable();
             $table->text('note_to_customer')->nullable();

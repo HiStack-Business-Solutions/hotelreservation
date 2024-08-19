@@ -22,6 +22,7 @@ class RoomDate extends BaseModel
         'start_date',
         'end_date',
         'price',
+        'discount',
         'max_guests',
         'active',
         'note_to_customer',
