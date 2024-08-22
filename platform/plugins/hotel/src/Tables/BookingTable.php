@@ -4,6 +4,7 @@ namespace Botble\Hotel\Tables;
 
 use Auth;
 use BaseHelper;
+use Botble\Blog\Exports\PostExport;
 use Botble\Hotel\Enums\BookingStatusEnum;
 use Botble\Hotel\Repositories\Interfaces\BookingInterface;
 use Botble\Table\Abstracts\TableAbstract;
@@ -23,6 +24,11 @@ class BookingTable extends TableAbstract
      * @var bool
      */
     protected $hasFilter = true;
+
+    /**
+     * @var string
+     */
+    protected $exportClass = PostExport::class;
 
     /**
      * BookingTable constructor.
@@ -73,6 +79,9 @@ class BookingTable extends TableAbstract
             })
             ->editColumn('status', function ($item) {
                 return $item->status->toHtml();
+            })
+            ->editColumn('discount', function ($item) {
+                return $item->discount . '%';
             })
             ->addColumn('operations', function ($item) {
                 return $this->getOperations('booking.edit', 'booking.destroy', $item);
@@ -158,7 +167,7 @@ class BookingTable extends TableAbstract
             ],
             'discount'      => [
                 'name'  => 'ht_bookings.discount',
-                'title' => trans('core/base::tables.discount'),
+                'title' => 'Discount',
                 'width' => '100px',
                 'class' => 'text-left',
             ],
@@ -198,5 +207,26 @@ class BookingTable extends TableAbstract
                 'type'  => 'date',
             ],
         ];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDefaultButtons(): array
+    {
+        // dd(Auth::user()->super_user);
+        if(Auth::user()->super_user == 1){
+
+            return [
+                'export',
+                'reload',
+            ];
+        }
+        else{
+            
+        return [
+            'reload',
+        ];
+        }
     }
 }
