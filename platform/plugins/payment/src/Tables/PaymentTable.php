@@ -3,6 +3,7 @@
 namespace Botble\Payment\Tables;
 
 use Illuminate\Support\Facades\Auth;
+use Botble\Blog\Exports\PostExport;
 use BaseHelper;
 use Botble\Payment\Enums\PaymentStatusEnum;
 use Botble\Payment\Repositories\Interfaces\PaymentInterface;
@@ -23,6 +24,11 @@ class PaymentTable extends TableAbstract
      * @var bool
      */
     protected $hasFilter = true;
+
+    /**
+     * @var string
+     */
+    protected $exportClass = PostExport::class;
 
     /**
      * PaymentTable constructor.
@@ -164,5 +170,26 @@ class PaymentTable extends TableAbstract
                 'type'  => 'date',
             ],
         ];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDefaultButtons(): array
+    {
+        // dd(Auth::user()->super_user);
+        if(Auth::user()->super_user == 1){
+
+            return [
+                'export',
+                'reload',
+            ];
+        }
+        else{
+            
+        return [
+            'reload',
+        ];
+        }
     }
 }
