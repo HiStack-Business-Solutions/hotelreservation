@@ -8,7 +8,7 @@
                 <div class="row justify-content-center room-gird-loop">
                     @foreach($rooms as $room)
                         <div class="col-sm-6">
-                            @include(Theme::getThemeNamespace() . '::views.hotel.includes.room-item', compact('room', 'nights'))
+                            @include(Theme::getThemeNamespace() . '::views.hotel.includes.room-item', compact('room', 'nights', 'categories'))
                         </div>
                     @endforeach
                 </div>
@@ -21,7 +21,7 @@
             <!-- form -->
             <div class="col-lg-4">
                 <div class="room-details">
-                    @include(Theme::getThemeNamespace() . '::views.hotel.includes.check-availability', ['availableForBooking' => false])
+                    @include(Theme::getThemeNamespace() . '::views.hotel.includes.check-availability', array_merge(['availableForBooking' => false], compact('categories')) )
                 </div>
             </div>
         </div>

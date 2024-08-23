@@ -6,4 +6,5 @@ use Botble\Support\Repositories\Interfaces\RepositoryInterface;
 
 interface RoomCategoryInterface extends RepositoryInterface
 {
+    
 }

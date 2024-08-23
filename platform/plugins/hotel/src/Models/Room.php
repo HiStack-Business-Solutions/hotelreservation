@@ -5,6 +5,7 @@ namespace Botble\Hotel\Models;
 use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Models\BaseModel;
 use Botble\Base\Traits\EnumCastable;
+use DateTime;
 use Exception;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -136,10 +137,15 @@ class Room extends BaseModel
      */
     public function isAvailableAt(array $filters = [])
     {
-        if (empty($filters['start_date']) || empty($filters['end_date'])) {
-            return true;
+        if (empty($filters['start_date'])) {
+            $filters['start_date'] = date('d-m-Y', time());
         }
-
+        if (empty($filters['end_date'])) {
+            $filters['end_date'] = date('d-m-Y', strtotime('tomorrow'));
+        }
+        if (!empty($filters['category']) && $filters['category'] != $this->room_category_id) {
+            return false;
+        }
         $roomDates = $this->getDatesInRange($filters['start_date'], $filters['end_date']);
         $allDates = [];
         $tmpNight = 0;

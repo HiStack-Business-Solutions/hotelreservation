@@ -8,10 +8,12 @@ use Botble\Hotel\Http\Requests\CheckoutRequest;
 use Botble\Hotel\Models\Booking;
 use Botble\Hotel\Models\Place;
 use Botble\Hotel\Models\Room;
+use Botble\Hotel\Repositories\Eloquent\RoomCategoryRepository;
 use Botble\Hotel\Repositories\Interfaces\BookingAddressInterface;
 use Botble\Hotel\Repositories\Interfaces\BookingInterface;
 use Botble\Hotel\Repositories\Interfaces\BookingRoomInterface;
 use Botble\Hotel\Repositories\Interfaces\PlaceInterface;
+use Botble\Hotel\Repositories\Interfaces\RoomCategoryInterface;
 use Botble\Hotel\Repositories\Interfaces\RoomInterface;
 use Botble\Hotel\Repositories\Interfaces\ServiceInterface;
 use Botble\Hotel\Services\BookingService;
@@ -46,7 +48,7 @@ class PublicController extends Controller
      * @return BaseHttpResponse|Response
      * @throws \Throwable
      */
-    public function getRooms(Request $request, RoomInterface $roomRepository, BaseHttpResponse $response)
+    public function getRooms(Request $request, RoomInterface $roomRepository, RoomCategoryInterface $roomCategoryRepository, BaseHttpResponse $response)
     {
         SeoHelper::setTitle(__('Rooms'));
 
@@ -91,6 +93,7 @@ class PublicController extends Controller
             'start_date' => $startDate->format('d-m-Y'),
             'end_date'   => $endDate->format('d-m-Y'),
             'adults'     => $request->input('adults', 1),
+            'category'   => $request->input('category', empty($categories) ? 0 : $categories[0]->id)
         ];
 
         $rooms = [];
@@ -99,6 +102,8 @@ class PublicController extends Controller
                 $rooms[] = $allRoom;
             }
         }
+
+        $categories = $roomCategoryRepository->getModel()->all();
 
         Theme::breadcrumb()
             ->add(__('Home'), url('/'))
@@ -113,7 +118,7 @@ class PublicController extends Controller
             return $response->setData($data);
         }
 
-        return Theme::scope('hotel.rooms', compact('rooms', 'nights'))->render();
+        return Theme::scope('hotel.rooms', compact('rooms', 'nights', 'categories'))->render();
     }
 
     /**

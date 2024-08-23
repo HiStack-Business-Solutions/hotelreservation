@@ -2,6 +2,7 @@
 
 use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Gallery\Repositories\Interfaces\GalleryInterface;
+use Botble\Hotel\Models\RoomCategory;
 use Botble\Hotel\Repositories\Interfaces\FeatureInterface;
 use Botble\Hotel\Repositories\Interfaces\FoodInterface;
 use Botble\Hotel\Repositories\Interfaces\FoodTypeInterface;
@@ -226,11 +227,14 @@ app()->booted(function () {
             ];
 
             $allRooms = app(RoomInterface::class)->getRooms($filters, $params);
+            
+            $categories = RoomCategory::all();
 
             $condition = [
                 'start_date' => $startDate->format('d-m-Y'),
                 'end_date'   => $endDate->format('d-m-Y'),
                 'adults'     => Request::input('adults', 1),
+                'category'   => Request::input('category', empty($categories) ? 0 : $categories[0]->id),
             ];
 
             $rooms = [];
@@ -240,9 +244,10 @@ app()->booted(function () {
                 }
             }
 
+
             $nights = $endDate->diffInDays($startDate);
 
-            return Theme::partial('short-codes.all-rooms', compact('rooms', 'nights'));
+            return Theme::partial('short-codes.all-rooms', compact('rooms', 'nights', 'categories'));
         });
     }
 

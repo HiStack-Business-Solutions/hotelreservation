@@ -27,6 +27,16 @@
                 @endfor
             </select>
         </div>
+        @if (!$availableForBooking && isset($categories) && !is_null($categories) && !empty($categories))
+            <div class="input-group input-group-two left-icon mb-20">
+                <label for="category">{{ __('Room Category') }}</label>
+                <select name="category" id="category">
+                    @foreach($categories as $cat)
+                        <option value="{{ $cat->id }}" @if (request()->query('category', $categories[0]->id) == $cat->id) selected @endif>{{ $cat->name }} </option>
+                    @endforeach
+                </select>
+            </div>
+        @endif
         <div class="input-group">
             <button class="main-btn btn-filled">{{ $availableForBooking ? __('Book Now') : __('Check Availability') }}</button>
         </div>
