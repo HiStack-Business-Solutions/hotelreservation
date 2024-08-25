@@ -3377,7 +3377,7 @@ INSERT INTO `translations` (`id`, `status`, `locale`, `group`, `key`, `value`, `
 (1662, 1, 'en', 'packages/theme/theme', 'theme_option_general_description', 'General settings', '2021-05-08 21:17:55', '2021-05-08 21:17:55'),
 (1663, 1, 'en', 'packages/theme/theme', 'theme_option_seo_open_graph_image', 'SEO default Open Graph image', '2021-05-08 21:17:55', '2021-05-08 21:17:55'),
 (1664, 1, 'en', 'packages/theme/theme', 'theme_option_logo', 'Logo', '2021-05-08 21:17:55', '2021-05-08 21:17:55'),
-(1665, 1, 'en', 'packages/theme/theme', 'theme_option_favicon', 'Favicon', '2021-05-08 21:17:55', '2021-05-08 21:17:55'),
+(1665, 1, 'en', 'packages/theme/theme', 'theme_option_favicon', 'favicon', '2021-05-08 21:17:55', '2021-05-08 21:17:55'),
 (1666, 1, 'en', 'packages/theme/theme', 'folder_is_not_writeable', 'Cannot write files! Folder :name is not writable. Please chmod to make it writable!', '2021-05-08 21:17:55', '2021-05-08 21:17:55'),
 (1667, 1, 'vi', 'packages/theme/theme', 'name', 'Giao diện', '2021-05-08 21:17:55', '2021-05-08 21:17:55'),
 (1668, 1, 'vi', 'packages/theme/theme', 'activated', 'Đã kích hoạt', '2021-05-08 21:17:55', '2021-05-08 21:17:55'),
