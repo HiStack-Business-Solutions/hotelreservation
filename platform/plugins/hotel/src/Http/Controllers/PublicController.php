@@ -5,6 +5,7 @@ namespace Botble\Hotel\Http\Controllers;
 use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Hotel\Http\Requests\CheckoutRequest;
+use Botble\Hotel\Mails\BookingMailer;
 use Botble\Hotel\Models\Booking;
 use Botble\Hotel\Models\Place;
 use Botble\Hotel\Models\Room;
@@ -28,12 +29,16 @@ use Botble\SeoHelper\SeoOpenGraph;
 use Botble\Slug\Repositories\Interfaces\SlugInterface;
 use Carbon\Carbon;
 use EmailHandler;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Response;
 use RvMedia;
+use SebastianBergmann\Environment\Console;
 use SeoHelper;
 use SlugHelper;
 use Theme;
@@ -496,6 +501,8 @@ class PublicController extends Controller
 
         $bookingService->processBooking($booking->id, $paymentData['charge_id']);
 
+
+
         if ($request->input('token')) {
             session()->forget($request->input('token'));
         }
@@ -517,7 +524,16 @@ class PublicController extends Controller
         if (!$booking) {
             abort(404);
         }
-
+        try {
+            // if (!$booking->is_order_emailed) {
+                (new BookingMailer($booking))->sendEmail();
+                $booking->is_order_emailed = true;
+                $bookingRepository->update(['id'=> $booking->id], ['is_order_emailed' => true]);
+            // }
+        } catch (Exception $err) {
+            Log::error($err);
+        }
+            
         SeoHelper::setTitle(__('Booking Information'));
 
         Theme::breadcrumb()
@@ -529,6 +545,7 @@ class PublicController extends Controller
 
     /**
      * @param Request $request
+     * 
      * @param BaseHttpResponse $response
      * @param RoomInterface $roomRepository
      * @param ServiceInterface $serviceRepository
