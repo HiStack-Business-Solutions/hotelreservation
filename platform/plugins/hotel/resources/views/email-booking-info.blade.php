@@ -3,7 +3,7 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Natura Ecopark - Order Information</title>
+    <title>Natura Ecopark - {{ $booking->status == \Botble\Hotel\Enums\BookingStatusEnum::COMPLETED() ? 'PAYMENT SUCCESS' : 'Order Information' }}</title>
     <style media="all" type="text/css">
 @media all {
   .btn-primary table td:hover {
@@ -103,7 +103,13 @@
                 <td class="wrapper" style="font-family: Helvetica, sans-serif; font-size: 16px; vertical-align: top; box-sizing: border-box; padding: 24px;" valign="top">
                   <p style="font-family: Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">Dear {{ $booking->address->first_name }} {{ $booking->address->last_name }},</p>
 
-                  <p style="font-family: Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">We are pleased to confirm your booking with Natura Ecopark. Please find the details of your reservation below</p>
+                  <p style="font-family: Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">
+                    {{ 
+                      $booking->status == \Botble\Hotel\Enums\BookingStatusEnum::COMPLETED() ?
+                      'Congratulations! Your booking was accepted by our admin. We are pleased to welcome you at the designated details below' :
+                      'We are pleased to confirm your booking with Natura Ecopark. Please find the details of your reservation below'
+                     }}
+                  </p>
                   <div id="printableArea">
                       <center>
                           <div class="justify-content-center">
@@ -193,6 +199,8 @@
                       <p><strong>{{ __('Total Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->amount) }}</span></p>
                       <p><strong>{{ __('Payment method') }}</strong>: {{ $booking->payment->id ? $booking->payment->payment_channel->label() : 'N/A' }}</p>
                   </div>
+                  
+                  <p><strong>{{ __('Payment status') }}</strong>: {!! $booking->status ? $booking->status->toHtml() : \Botble\Hotel\Enums\BookingStatusEnum::COMPLETED()->toHtml() !!}</p>
 
                   <p style="font-family: Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">If you have any questions or need to make changes to your reservation, please do not hesitate to contact us at [Contact Information].</p>
 

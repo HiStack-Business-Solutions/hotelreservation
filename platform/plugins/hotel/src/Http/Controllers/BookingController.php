@@ -8,13 +8,16 @@ use Botble\Base\Events\UpdatedContentEvent;
 use Botble\Base\Forms\FormBuilder;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Base\Http\Responses\BaseHttpResponse;
+use Botble\Hotel\Enums\BookingStatusEnum;
 use Botble\Hotel\Forms\BookingForm;
 use Botble\Hotel\Http\Requests\BookingRequest;
+use Botble\Hotel\Mails\BookingMailer;
 use Botble\Hotel\Repositories\Interfaces\BookingInterface;
 use Botble\Hotel\Tables\BookingTable;
 use Exception;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Throwable;
 
@@ -68,13 +71,28 @@ class BookingController extends BaseController
      * @param BaseHttpResponse $response
      * @return BaseHttpResponse
      */
-    public function update($id, BookingRequest $request, BaseHttpResponse $response)
+    public function update($id, BookingRequest $request, BaseHttpResponse $response, BookingInterface $bookingRepository)
     {
         $booking = $this->bookingRepository->findOrFail($id);
 
         $booking->fill($request->input());
-
+        if (!$booking->payment_proof && $booking->status == BookingStatusEnum::COMPLETED()) 
+        {
+            return $response
+                ->setError(true)
+                ->setMessage('Perlu Bukti Transfer');
+        }
         $this->bookingRepository->createOrUpdate($booking);
+
+        try {
+            if (!$booking->is_payment_emailed && $booking->status == BookingStatusEnum::COMPLETED()) {
+                BookingMailer::sendFullPaymentEmail($booking);
+                $booking->is_payment_emailed = true;
+                $bookingRepository->update(['id'=> $booking->id], ['is_payment_emailed' => true]);
+            }
+        } catch (Exception $err) {
+            Log::error($err);
+        }
 
         event(new UpdatedContentEvent(BOOKING_MODULE_SCREEN_NAME, $request, $booking));
 

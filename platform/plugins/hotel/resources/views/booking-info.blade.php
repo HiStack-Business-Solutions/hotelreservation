@@ -1,103 +1,140 @@
 @if ($booking)
-<div id="printableArea">
-    <center>
-        <div class="justify-content-center">
-            <div class="booking-form-body room-details">
-                <h3 class="mb-20">PANORAMA ECOPARK</h3>
-                <br>
+    <div id="printableArea">
+        <center>
+            <div class="justify-content-center">
+                <div class="booking-form-body room-details">
+                    <h3 class="mb-20">NATURA ECOPARK</h3>
+                    <br>
+                </div>
+            </div>
+        </center>
+
+        <div class="row">
+            <div class="col-md-6">
+                <strong><p>{{ __('Transaction ID') }}: <i>{{ $booking->transaction_id }}</i></strong></p>
+                <p>{{ __('Time') }}: <i>{{ $booking->created_at }}</i></p>
+                <p>{{ __('Full Name') }}: <i>{{ $booking->address->first_name }} {{ $booking->address->last_name }}</i></p>
+                <p>{{ __('Email') }}: <i><a href="mailto:{{ $booking->address->email }}">{{ $booking->address->email }}</a></i></p>
+                <p>{{ __('Phone') }}: <i>@if ($booking->address->phone) <a href="tel:{{ $booking->address->phone }}">{{ $booking->address->phone }}</a> @else N/A @endif</i></p>
+            </div>
+            <div class="col-md-6">
+                <p>{{ __('Address') }}: <i>{{ $booking->address->id ? $booking->address->address . ', ' . $booking->address->city . ', ' . $booking->address->state . ', ' . $booking->address->country . ', ' . $booking->address->zip : 'N/A' }}</i></p>
+                <p>{{ __('Room') }}: <i>@if ($booking->room->room->id) <a href="{{ $booking->room->room->url }}" target="_blank">{{ $booking->room->room->name }}</a> @else N/A @endif</i></p>
+                <p><strong>{{ __('Start Date') }}</strong>: <i>{{ $booking->room->start_date }}</i></p>
+                <p><strong>{{ __('End Date') }}</strong>: <i>{{ $booking->room->end_date }}</i></p>
+                <p><strong>{{ __('Arrival Time') }}</strong>: <i>{{ $booking->arrival_time }}</i></p>
             </div>
         </div>
-    </center>
-
-    <div class="row">
-        <div class="col-md-6">
-            <strong><p>{{ __('Transaction ID') }}: <i>{{ $booking->transaction_id }}</i></strong></p>
-            <p>{{ __('Time') }}: <i>{{ $booking->created_at }}</i></p>
-            <p>{{ __('Full Name') }}: <i>{{ $booking->address->first_name }} {{ $booking->address->last_name }}</i></p>
-            <p>{{ __('Email') }}: <i><a href="mailto:{{ $booking->address->email }}">{{ $booking->address->email }}</a></i></p>
-            <p>{{ __('Phone') }}: <i>@if ($booking->address->phone) <a href="tel:{{ $booking->address->phone }}">{{ $booking->address->phone }}</a> @else N/A @endif</i></p>
-        </div>
-        <div class="col-md-6">
-            <p>{{ __('Address') }}: <i>{{ $booking->address->id ? $booking->address->address . ', ' . $booking->address->city . ', ' . $booking->address->state . ', ' . $booking->address->country . ', ' . $booking->address->zip : 'N/A' }}</i></p>
-            <p>{{ __('Room') }}: <i>@if ($booking->room->room->id) <a href="{{ $booking->room->room->url }}" target="_blank">{{ $booking->room->room->name }}</a> @else N/A @endif</i></p>
-            <p><strong>{{ __('Start Date') }}</strong>: <i>{{ $booking->room->start_date }}</i></p>
-            <p><strong>{{ __('End Date') }}</strong>: <i>{{ $booking->room->end_date }}</i></p>
-            <p><strong>{{ __('Arrival Time') }}</strong>: <i>{{ $booking->arrival_time }}</i></p>
-        </div>
-    </div>
-    <br>
-    @if ($booking->requests)
-        <p style="margin-bottom: 10px;"><strong>{{ __('Requests') }}</strong>: {{ $booking->requests }}</p>
-    @endif
-    <p><strong>{{ __('Room') }}</strong>:</p>
-    <table class="table table-bordered">
-        <thead>
-        <tr>
-            <!-- <th class="text-center">{{ __('Image') }}</th> -->
-            <th>{{ __('Name') }}</th>
-            <th class="text-center">{{ __('Checkin Date') }}</th>
-            <th class="text-center">{{ __('Checkout Date') }}</th>
-            <!-- <th class="text-center">{{ __('Number of rooms') }}</th> -->
-            <th class="text-center">{{ __('Price') }}</th>
-            <th class="text-center">{{ __('Tax') }}</th>
-        </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <!-- <td class="text-center" style="width: 150px; vertical-align: middle">
-                    <a href="{{ $booking->room->room->url }}" target="_blank">
-                        <img src="{{ RvMedia::getImageUrl($booking->room->room->image, 'thumb', false, RvMedia::getDefaultImage()) }}" alt="{{ $booking->room->room->name }}" width="140">
-                    </a>
-                </td> -->
-                <td style="vertical-align: middle"><a href="{{ $booking->room->room->url }}" target="_blank">{{ $booking->room->room->name }}</a></td>
-                <td class="text-center" style="vertical-align: middle">{{ $booking->room->start_date }}</td>
-                <td class="text-center" style="vertical-align: middle">{{ $booking->room->end_date }}</td>
-                <!-- <td class="text-center" style="vertical-align: middle">{{ $booking->room->number_of_rooms }}</td> -->
-                <td class="text-center" style="vertical-align: middle"><strong>{{ format_price($booking->room->price) }}</strong></td>
-                <td class="text-center" style="vertical-align: middle"><strong>{{ format_price($booking->tax_amount) }}</strong></td>
-            </tr>
-        </tbody>
-    </table>
-    <br>
-    @if ($booking->services->count())
-        <p><strong>{{ __('Services') }}</strong>:</p>
+        <br>
+        @if ($booking->requests)
+            <p style="margin-bottom: 10px;"><strong>{{ __('Requests') }}</strong>: {{ $booking->requests }}</p>
+        @endif
+        <p><strong>{{ __('Room') }}</strong>:</p>
         <table class="table table-bordered">
             <thead>
             <tr>
+                <!-- <th class="text-center">{{ __('Image') }}</th> -->
                 <th>{{ __('Name') }}</th>
+                <th class="text-center">{{ __('Checkin Date') }}</th>
+                <th class="text-center">{{ __('Checkout Date') }}</th>
+                <!-- <th class="text-center">{{ __('Number of rooms') }}</th> -->
                 <th class="text-center">{{ __('Price') }}</th>
-                <th class="text-center">{{ __('Total') }}</th>
+                <th class="text-center">{{ __('Tax') }}</th>
             </tr>
             </thead>
             <tbody>
-            @foreach($booking->services as $service)
                 <tr>
-                    <td style="vertical-align: middle">
-                        {{ $service->name }}
-                    </td>
-                    <td class="text-center" style="vertical-align: middle">{{ format_price($service->price) }} x {{ $booking->room->number_of_rooms }}</td>
-                    <td class="text-center" style="vertical-align: middle">{{ format_price($service->price * $booking->room->number_of_rooms) }}</td>
+                    <!-- <td class="text-center" style="width: 150px; vertical-align: middle">
+                        <a href="{{ $booking->room->room->url }}" target="_blank">
+                            <img src="{{ RvMedia::getImageUrl($booking->room->room->image, 'thumb', false, RvMedia::getDefaultImage()) }}" alt="{{ $booking->room->room->name }}" width="140">
+                        </a>
+                    </td> -->
+                    <td style="vertical-align: middle"><a href="{{ $booking->room->room->url }}" target="_blank">{{ $booking->room->room->name }}</a></td>
+                    <td class="text-center" style="vertical-align: middle">{{ $booking->room->start_date }}</td>
+                    <td class="text-center" style="vertical-align: middle">{{ $booking->room->end_date }}</td>
+                    <!-- <td class="text-center" style="vertical-align: middle">{{ $booking->room->number_of_rooms }}</td> -->
+                    <td class="text-center" style="vertical-align: middle"><strong>{{ format_price($booking->room->price) }}</strong></td>
+                    <td class="text-center" style="vertical-align: middle"><strong>{{ format_price($booking->tax_amount) }}</strong></td>
                 </tr>
-            @endforeach
             </tbody>
         </table>
         <br>
-    @endif
-    <br>
-    <p><strong>{{ __('Discount') }}</strong>: <span class="text-danger">{{ $booking->discount}}% <i>(exclude Service)</i></span></p>
-    <p><strong>{{ __('Total Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->amount) }}</span></p>
-    <p><strong>{{ __('Payment method') }}</strong>: {{ $booking->payment->id ? $booking->payment->payment_channel->label() : 'N/A' }}</p>
-</div>
-<p><strong>{{ __('Payment status') }}</strong>: {!! $booking->payment->id ? $booking->payment->status->toHtml() : \Botble\Payment\Enums\PaymentStatusEnum::PENDING()->toHtml() !!}</p>
+        @if ($booking->services->count())
+            <p><strong>{{ __('Services') }}</strong>:</p>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>{{ __('Name') }}</th>
+                    <th class="text-center">{{ __('Price') }}</th>
+                    <th class="text-center">{{ __('Total') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($booking->services as $service)
+                    <tr>
+                        <td style="vertical-align: middle">
+                            {{ $service->name }}
+                        </td>
+                        <td class="text-center" style="vertical-align: middle">{{ format_price($service->price) }} x {{ $booking->room->number_of_rooms }}</td>
+                        <td class="text-center" style="vertical-align: middle">{{ format_price($service->price * $booking->room->number_of_rooms) }}</td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+            <br>
+        @endif
+        <br>
+        <p><strong>{{ __('Discount') }}</strong>: <span class="text-danger">{{ $booking->discount}}% <i>(exclude Service)</i></span></p>
+        <p><strong>{{ __('Total Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->amount) }}</span></p>
+        <p><strong>{{ __('Payment method') }}</strong>: {{ $booking->payment->id ? $booking->payment->payment_channel->label() : 'N/A' }}</p>
+    </div>
+    <p><strong>{{ __('Payment status') }}</strong>: {!! $booking->payment->id ? $booking->payment->status->toHtml() : \Botble\Payment\Enums\PaymentStatusEnum::PENDING()->toHtml() !!}</p>
 
-<div style="display: flex; justify-content: flex-end;">
-    <button onclick="printDiv('printableArea')" style="background-color: #007bff; color: white; border: none; padding: 8px 20px; border-radius: 5px; display: flex; align-items: center; margin-right: 10px;">
-        <i class="fa fa-print" aria-hidden="true" style="margin-right: 5px;"></i> Print
-    </button>
-    <button onclick="printThermalPreview()" style="background-color: #ffc107; color: white; border: none; padding: 8px 20px; border-radius: 5px; display: flex; align-items: center;">
-        <i class="fa fa-file-alt" aria-hidden="true" style="margin-right: 5px;"></i> Thermal Print Preview
-    </button>
-</div>
+    <div style="display: flex; justify-content: flex-end;">
+        <button onclick="printDiv('printableArea')" style="background-color: #007bff; color: white; border: none; padding: 8px 20px; border-radius: 5px; display: flex; align-items: center; margin-right: 10px;">
+            <i class="fa fa-print" aria-hidden="true" style="margin-right: 5px;"></i> Print
+        </button>
+        <button onclick="printThermalPreview()" style="background-color: #ffc107; color: white; border: none; padding: 8px 20px; border-radius: 5px; display: flex; align-items: center;">
+            <i class="fa fa-file-alt" aria-hidden="true" style="margin-right: 5px;"></i> Thermal Print Preview
+        </button>
+    </div>
+    @if($showUploadForm)
+    <form action="{{ route('public.booking.storePaymentProof') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="form-group">
+            <input type="hidden" name="booking_id" value="{{ $booking->id }}">
+            <label for="payment_proof">Payment Proof (Max 2MB, JPG/JPEG/PNG)</label>
+            <input type="file" name="payment_proof" id="payment_proof" class="form-control" required>
+            @if ($errors->has('payment_proof'))
+                <div class="alert alert-danger mt-2">
+                    {{ $errors->first('payment_proof') }}
+                </div>
+            @endif
+        </div>
+        @if ($fileExists)
+            <p style="color: green;">File sudah di uploaded.@if (!Auth::check()) <br/>Mohon menunggu konfirmasi dari admin.@endif</p>
+            <div style="display: flex; justify-content: flex-end;">
+                <button type="submit" style="background-color: #28a745; color: white; border: none; padding: 8px 20px; border-radius: 5px; display: flex; align-items: center;">
+                    <i class="fa fa-upload" aria-hidden="true" style="margin-right: 5px;"></i> @if(Auth::check()) {{ 'Timpa Bukti Transfer' }} @else {{ 'Reupload Ulang Bukti Transfer' }} @endif
+                </button>
+            </div>
+        @else
+            <div style="display: flex; justify-content: flex-end;">
+                <button type="submit" style="background-color: #28a745; color: white; border: none; padding: 8px 20px; border-radius: 5px; display: flex; align-items: center;">
+                    <i class="fa fa-upload" aria-hidden="true" style="margin-right: 5px;"></i> Upload Bukti Transfer
+                </button>
+            </div>
+        @endif
+    </form>
+    @endif
+    @if(Auth::check() && $booking->payment_proof_base64)
+        <div style="position: relative; display: flex; justify-content: center; margin: 20px;">
+            <label for="payment_proof_image" style="position: absolute; top: 0; left: 0; background-color: rgba(255, 255, 255, 0.7); padding: 5px; border-radius: 3px; font-weight: bold;">
+                File Bukti Transfer (Preview)
+            </label>
+            <img name="payment_proof_image" id="payment_proof_image" src="{{ $booking->payment_proof_base64 }}" alt="Payment Proof" style="max-width: 600px; height: auto; margin-top: 30px;">
+        </div>
+    @endif
 @endif
 
 <script>

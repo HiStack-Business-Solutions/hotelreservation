@@ -6,6 +6,8 @@ use Botble\Base\Forms\FormAbstract;
 use Botble\Hotel\Enums\BookingStatusEnum;
 use Botble\Hotel\Http\Requests\BookingRequest;
 use Botble\Hotel\Models\Booking;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class BookingForm extends FormAbstract
 {
@@ -15,6 +17,20 @@ class BookingForm extends FormAbstract
      */
     public function buildForm()
     {
+        $booking = $this->getModel();
+        $fileExists = Storage::exists('public/payment_proofs/' . $booking->payment_proof);
+        if ($booking->payment_proof && $fileExists) {
+            $filePath = 'public/payment_proofs/' . $booking->payment_proof;
+            $fileContents = Storage::get($filePath);
+            $base64 = base64_encode($fileContents);
+            $mimeType = Storage::mimeType($filePath);
+    
+            // Pass base64 string and mime type to view
+            $booking->payment_proof_base64 = 'data:' . $mimeType . ';base64,' . $base64;
+        } else {
+            $booking->payment_proof_base64 = null;
+        }
+        $showUploadForm = false;
         $this
             ->setupModel(new Booking)
             ->setValidatorClass(BookingRequest::class)
@@ -31,7 +47,7 @@ class BookingForm extends FormAbstract
             ->addMetaBoxes([
                 'information' => [
                     'title'      => trans('plugins/hotel::booking.booking_information'),
-                    'content'    => view('plugins/hotel::booking-info', ['booking' => $this->getModel()])->render(),
+                    'content'    => view('plugins/hotel::booking-info', compact('booking', 'fileExists', 'showUploadForm'))->render(),
                     'attributes' => [
                         'style' => 'margin-top: 0',
                     ],
