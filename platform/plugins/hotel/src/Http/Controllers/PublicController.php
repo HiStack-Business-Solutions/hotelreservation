@@ -5,6 +5,7 @@ namespace Botble\Hotel\Http\Controllers;
 use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Hotel\Http\Requests\CheckoutRequest;
+use Botble\Hotel\Mails\BookingMailer;
 use Botble\Hotel\Models\Booking;
 use Botble\Hotel\Models\Place;
 use Botble\Hotel\Models\Room;
@@ -28,12 +29,17 @@ use Botble\SeoHelper\SeoOpenGraph;
 use Botble\Slug\Repositories\Interfaces\SlugInterface;
 use Carbon\Carbon;
 use EmailHandler;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Response;
 use RvMedia;
+use SebastianBergmann\Environment\Console;
 use SeoHelper;
 use SlugHelper;
 use Theme;
@@ -41,6 +47,15 @@ use Throwable;
 
 class PublicController extends Controller
 {
+    function uuidv4()
+    {
+        $data = random_bytes(16);
+
+        $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0100
+        $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
+            
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
     /**
      * @param Request $request
      * @param RoomInterface $roomRepository
@@ -416,7 +431,7 @@ class PublicController extends Controller
         // $taxAmount = $room->tax->percentage * $room->price / 100;
         // $booking->amount = $room->price * $nights + $taxAmount;
         // $booking->tax_amount = $taxAmount;
-        $booking->transaction_id = Str::upper(Str::random(5));
+        $booking->transaction_id = $this->uuidv4();
 
         if ($request->input('services')) {
             $services = $serviceRepository->getModel()
@@ -496,6 +511,8 @@ class PublicController extends Controller
 
         $bookingService->processBooking($booking->id, $paymentData['charge_id']);
 
+
+
         if ($request->input('token')) {
             session()->forget($request->input('token'));
         }
@@ -517,18 +534,55 @@ class PublicController extends Controller
         if (!$booking) {
             abort(404);
         }
-
+        try {
+            if (!$booking->is_order_emailed) {
+                BookingMailer::sendBookingInfoEmail($booking);
+                $booking->is_order_emailed = true;
+                $bookingRepository->update(['id'=> $booking->id], ['is_order_emailed' => true]);
+            }
+        } catch (Exception $err) {
+            Log::error($err);
+        }
+            
         SeoHelper::setTitle(__('Booking Information'));
 
         Theme::breadcrumb()
             ->add(__('Home'), url('/'))
             ->add(__('Booking'), route('public.booking.information', $transactionId));
-
-        return Theme::scope('hotel.booking-information', compact('booking'))->render();
+        $fileName = $booking->id . '-' . $booking->transaction_id;
+        $fileExists = Storage::exists('public/payment_proofs/' . $fileName);
+        $showUploadForm = true;
+        return Theme::scope('hotel.booking-information', compact('booking', 'fileExists', 'fileName', 'showUploadForm'))->render();
     }
 
+    public function storePaymentProof(Request $request, BookingInterface $bookingRepository)
+    {
+        $request->validate([
+            'payment_proof' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Retrieve the uploaded file
+        $file = $request->file('payment_proof');
+
+        // Define a unique file name and store the file
+        
+        $booking = Booking::find($request->booking_id);
+
+        if (!$booking) {
+            abort(404);
+        }        
+        $filename = $booking->id . '-' . $booking->transaction_id;
+        $path = $file->storeAs('public/payment_proofs', $filename);
+
+        // Store the file path in the database associated with the booking
+        $booking->payment_proof = $filename;
+        $booking->save();
+
+        return back()->with('success', 'Payment proof uploaded successfully.');
+    }
     /**
      * @param Request $request
+     * 
      * @param BaseHttpResponse $response
      * @param RoomInterface $roomRepository
      * @param ServiceInterface $serviceRepository

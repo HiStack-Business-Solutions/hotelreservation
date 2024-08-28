@@ -1,5 +1,6 @@
 <?php
 
+use Botble\Hotel\Http\Controllers\PublicController;
 use Botble\Hotel\Models\Place;
 use Botble\Hotel\Models\Room;
 
@@ -142,6 +143,8 @@ Route::group(['namespace' => 'Botble\Hotel\Http\Controllers', 'middleware' => ['
 
             Route::post('booking', 'PublicController@postBooking')->name('public.booking');
             Route::get('booking/{token}', 'PublicController@getBooking')->name('public.booking.form');
+            Route::post('booking/payment-proof', [PublicController::class, 'storePaymentProof'])->name('public.booking.storePaymentProof');
+
 
             Route::post('checkout', 'PublicController@postCheckout')->name('public.booking.checkout');
 
