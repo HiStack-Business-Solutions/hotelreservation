@@ -50,7 +50,7 @@
 
         <div class="text-left">
         <h4 class="title"><a href="{{ $room->url }}">{{ $room->name }}</a></h4>
-        <p class="mb-10"><a>Room Available : </a>
+        <break class="mb-10"><a>Room Available : </a>
             <a href="{{ $room->url }}">
                 @if ($filteredDates->isEmpty())
                     {{ $room->number_of_rooms }}
@@ -60,7 +60,12 @@
                     @endforeach
                 @endif  
             </a>
-        </p>
+        </break>
+        <br class="mb-10"><a>Capacity : </a>
+            <a href="{{ $room->url }}">
+                {{ $room->max_adults }} + {{ $room->max_children }} anak kecil
+            </a>
+        </br>
         <p class="mb-10"><a>Discount : </a>
             <a href="{{ $room->url }}">
                 @if ($filteredDates->isEmpty())
