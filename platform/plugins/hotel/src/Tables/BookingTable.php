@@ -148,11 +148,11 @@ class BookingTable extends TableAbstract
                 'title' => trans('plugins/hotel::booking.payment_method'),
                 'class' => 'text-center',
             ],
-            'payment_status'  => [
-                'name'  => 'ht_bookings.id',
-                'title' => trans('plugins/hotel::booking.payment_status_label'),
-                'class' => 'text-center',
-            ],
+            // 'payment_status'  => [
+            //     'name'  => 'ht_bookings.id',
+            //     'title' => trans('plugins/hotel::booking.payment_status_label'),
+            //     'class' => 'text-center',
+            // ],
             'created_at'  => [
                 'name'  => 'ht_bookings.created_at',
                 'title' => trans('core/base::tables.created_at'),

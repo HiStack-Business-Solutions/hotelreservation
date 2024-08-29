@@ -7,6 +7,7 @@ use Botble\Base\Models\BaseModel;
 use Botble\Base\Traits\EnumCastable;
 use DateTime;
 use Exception;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Arr;
@@ -90,11 +91,13 @@ class Room extends BaseModel
     }
 
     /**
-     * @return BelongsToMany
+     * Relasi ke RoomDate
+     *
+     * @return HasMany
      */
-    public function roomDatesTwo(): BelongsToMany
+    public function roomDatesTwo(): HasMany
     {
-        return $this->belongsToMany(RoomDate::class, 'ht_rooms_amenities', 'room_id', 'amenity_id');
+        return $this->hasMany(RoomDate::class, 'room_id');
     }
 
     /**

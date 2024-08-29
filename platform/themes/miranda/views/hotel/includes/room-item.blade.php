@@ -18,8 +18,7 @@
         }
         
         return $item['room_id'] == $room->id &&
-            $itemStartDate >= $startDate &&
-            $itemEndDate <= $endDate;
+            $itemStartDate == $startDate;
     });
    // dd($room->roomDatesTwo);
 @endphp
