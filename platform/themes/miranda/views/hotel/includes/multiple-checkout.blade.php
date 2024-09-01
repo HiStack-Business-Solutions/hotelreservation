@@ -163,8 +163,9 @@ document.addEventListener('DOMContentLoaded',init,false);
 }
          
 </style>
-<form hidden id="multi-booking" class="animate-fadeIn rounded-lg" style="background-color: rgb(43 43 43); font-family: 'Old Standard TT', serif; color: #fff; font-size: 14px;">
+<form hidden action="{{route('public.booking')}}" method="post" id="multi-booking" class="animate-fadeIn rounded-lg" style="background-color: rgb(43 43 43); font-family: 'Old Standard TT', serif; color: #fff; font-size: 14px;">
     @csrf
+    <input type="hidden" name="multiple_booking" value="true">
     <input type="hidden" name="start_date" value="{{ request()->query('start_date', now()->format('d-m-Y')) }}">
     <input type="hidden" name="end_date" value="{{ request()->query('end_date', now()->addDay()->format('d-m-Y')) }}">
     <input type="hidden" name="adults" value="{{ request()->query('adults', 0) }}">
@@ -193,6 +194,6 @@ document.addEventListener('DOMContentLoaded',init,false);
     </div>
     
     <div class="input-group">
-        <button class="self-align-center main-btn btn-filled add-booking-btn col p-3 m-3">{{ __('Book All Now') }}</button>
+        <button type="submit" class="self-align-center main-btn btn-filled add-booking-btn col p-3 m-3">{{ __('Book All Now') }}</button>
     </div>
 </div>
