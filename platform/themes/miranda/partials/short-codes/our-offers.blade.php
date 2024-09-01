@@ -22,7 +22,7 @@
                                     <input type="hidden" name="room_id" value="{{ $room->id }}">
                                     <input type="hidden" name="start_date" value="{{ request()->query('start_date', now()->format('d-m-Y')) }}">
                                     <input type="hidden" name="end_date" value="{{ request()->query('end_date', now()->addDay()->format('d-m-Y')) }}">
-                                    <input type="hidden" name="adults" value="{{ request()->query('adults', 1) }}">
+                                    <input type="hidden" name="adults" value="{{ request()->query('adults', 0) }}">
                                     <button type="submit" class="main-btn btn-filled booking-button">{{ __('Book now for :price', ['price' => format_price($room->price * (isset($nights) ? $nights : 1))]) }}</button>
                                 </form>
                             </div>

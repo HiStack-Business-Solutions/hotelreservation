@@ -79,13 +79,16 @@
         </p>
 
 <p class="mb-10">{{ $room->description }}</p>
-<form action="{{ route('public.booking') }}" method="POST">
+<form action="{{ route('public.booking') }}" method="POST" class="col">
     @csrf
     <input type="hidden" name="room_id" value="{{ $room->id }}">
     <input type="hidden" name="start_date" value="{{ request()->query('start_date', now()->format('d-m-Y')) }}">
     <input type="hidden" name="end_date" value="{{ request()->query('end_date', now()->addDay()->format('d-m-Y')) }}">
-    <input type="hidden" name="adults" value="{{ request()->query('adults', 1) }}">
-    <button type="submit" class="main-btn btn-filled booking-button">
+    <input type="hidden" name="adults" value="{{ request()->query('adults', 0) }}">
+    <button type="button" class="rounded col my-1 main-btn btn-filled add-booking-btn" onclick="plus('{{$room->id}}')">
+        {{ __("Add To Multiple Booking") }}
+    </button>
+    <button type="submit" class="rounded col my-1 main-btn btn-filled booking-button">
 
         @if ($filteredDates->isEmpty())
             {{ __('Booking :price', ['price' => format_price($room->price * (isset($nights) ? $nights : 1))]) }}

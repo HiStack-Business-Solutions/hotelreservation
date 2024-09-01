@@ -36,6 +36,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Response;
 use RvMedia;
@@ -55,6 +56,18 @@ class PublicController extends Controller
         $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
             
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+    public function getMultiBookRoomItem($roomId, SlugInterface $slugRepository, RoomInterface $roomRepository, Request $request) {
+        $room = $roomRepository->getFirstBy(
+            ['id' => $roomId],
+            ['*'],
+        );
+
+        if (!$room) {
+            abort(404);
+        }
+        $request->headers->set('no_admin_bar', true);
+        return view(Theme::getThemeNamespace() . '::views.hotel.includes.book-room-item', compact('room'))->render();
     }
     /**
      * @param Request $request

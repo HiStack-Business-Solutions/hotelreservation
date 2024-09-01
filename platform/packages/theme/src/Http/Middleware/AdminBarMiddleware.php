@@ -79,7 +79,7 @@ class AdminBarMiddleware
             return $response;
         }
 
-        $this->injectAdminBar($response);
+        $this->injectAdminBar($request, $response);
 
         return $response;
     }
@@ -100,8 +100,11 @@ class AdminBarMiddleware
      * Based on https://github.com/symfony/WebProfilerBundle/blob/master/EventListener/WebDebugToolbarListener.php
      * @throws Throwable
      */
-    public function injectAdminBar(Response $response)
+    public function injectAdminBar(Request $request, Response $response)
     {
+        if ($request->headers->get('no_admin_bar')) {
+            return;
+        }
         $content = $response->getContent();
 
         $this->injectHeadContent($content)->injectAdminBarHtml($content);

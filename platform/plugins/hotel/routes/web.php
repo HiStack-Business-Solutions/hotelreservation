@@ -138,8 +138,13 @@ Route::group(['namespace' => 'Botble\Hotel\Http\Controllers', 'middleware' => ['
             Route::get(SlugHelper::getPrefix(Room::class, 'rooms'), 'PublicController@getRooms')->name('public.rooms');
 
             Route::get(SlugHelper::getPrefix(Room::class, 'rooms') . '/{slug}', 'PublicController@getRoom');
-
+            
+            
             Route::get(SlugHelper::getPrefix(Place::class, 'places') . '/{slug}', 'PublicController@getPlace');
+            
+            Route::get('room-book/{roomId}', 'PublicController@getMultiBookRoomItem')
+                ->name('public.rooms.bookitem');
+            
 
             Route::post('booking', 'PublicController@postBooking')->name('public.booking');
             Route::get('booking/{token}', 'PublicController@getBooking')->name('public.booking.form');

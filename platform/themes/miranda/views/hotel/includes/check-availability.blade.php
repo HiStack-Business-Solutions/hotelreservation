@@ -22,8 +22,9 @@
         <div class="input-group input-group-two left-icon mb-20">
             <label for="adults">{{ __('Guests') }}</label>
             <select name="adults" id="adults">
+                <option value="0" @if (request()->query('adults', 0) == 0) selected @endif>Any</option>
                 @for($i = 1; $i <= 10; $i++)
-                    <option value="{{ $i }}" @if (request()->query('adults', 1) == $i) selected @endif>{{ $i }} {{ $i == 1 ? __('Guest') : __('Guests') }}</option>
+                    <option value="{{ $i }}" @if (request()->query('adults') == $i) selected @endif>{{ $i }} {{ $i == 1 ? __('Guest') : __('Guests') }}</option>
                 @endfor
             </select>
         </div>

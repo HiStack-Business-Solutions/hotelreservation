@@ -1,4 +1,6 @@
 {
+    "Total capacity": "Total capacity",
+    "Add To Multiple Booking": "Add To Multiple Booking",
     "404 - Not found": "404 - Not found",
     ":count rooms available": ":count rooms available",
     "AM": "AM",
@@ -19,6 +21,7 @@
     "Arrival Time": "Arrival Time",
     "Banner image in news": "Banner image in news",
     "Banner image in rooms": "Banner image in rooms",
+    "Book All Now": "Book All Now",
     "Book Now": "Book Now",
     "Book now for :price": "Book now for :price",
     "Booking": "Booking",

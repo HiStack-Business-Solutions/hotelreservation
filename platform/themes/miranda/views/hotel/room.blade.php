@@ -79,7 +79,7 @@
                 @include(Theme::getThemeNamespace() . '::views.hotel.includes.check-availability', ['room' => $room, 'availableForBooking' => $room->isAvailableAt([
                     'start_date' => request()->query('start_date', now()->format('d-m-Y')),
                     'end_date'   => request()->query('end_date', now()->addDay()->format('d-m-Y')),
-                    'adults'     => request()->query('adults', 1),
+                    'adults'     => request()->query('adults', 0),
                 ])])
             </div>
         </div>
