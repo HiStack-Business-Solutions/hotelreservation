@@ -53,7 +53,7 @@
                         <input type="hidden" name="room_id" value="{{ $room->id }}">
                         @else
                             @foreach($rooms as $r)
-                            <input type="hidden" name="rooms[{{$r->id}}]" value="{{ $bookings[$r->id] }}">
+                            <input type="hidden" name="numberOfRooms[{{$r->id}}]" value="{{ $roomBookings[$r->id]['number_of_rooms'] }}">
                             @endforeach
                         @endif
                         <input type="hidden" name="start_date" value="{{ $startDate->format('d-m-Y') }}">
@@ -327,8 +327,8 @@
             <div class="col-lg-4 col-md-8 col-sm-10">
                 <div class="sidebar">
                     @if ($multiBook)
-                        @include(Theme::getThemeNamespace() . '::views.hotel.includes.multiple-checkout', compact('checkout', 'rooms', 'bookings') )
-                    @else if($room) 
+                        @include(Theme::getThemeNamespace() . '::views.hotel.includes.multiple-checkout', compact('checkout', 'rooms', 'roomBookings') )
+                    @elseif($room) 
                     <div style="font-family: 'Old Standard TT', serif; color: #fff; font-size: 14px;">
                         <div style="position: relative">
                             <span class="room-type" style="background-color: #bead8e; color: #fff; padding: 3px 5px; text-transform: uppercase; position: absolute; top: 15px; left: 15px;">{{ $room->name }}</span>

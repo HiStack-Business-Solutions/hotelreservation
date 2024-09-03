@@ -29,7 +29,7 @@
         @if ($booking->requests)
             <p style="margin-bottom: 10px;"><strong>{{ __('Requests') }}</strong>: {{ $booking->requests }}</p>
         @endif
-        <p><strong>{{ __('Room') }}</strong>:</p>
+        <p><strong>{{ __('Room(s)') }}</strong>:</p>
         <table class="table table-bordered">
             <thead>
             <tr>
@@ -37,25 +37,22 @@
                 <th>{{ __('Name') }}</th>
                 <th class="text-center">{{ __('Checkin Date') }}</th>
                 <th class="text-center">{{ __('Checkout Date') }}</th>
-                <!-- <th class="text-center">{{ __('Number of rooms') }}</th> -->
+                <th class="text-center">{{ __('Number of rooms') }}</th>
                 <th class="text-center">{{ __('Price') }}</th>
                 <th class="text-center">{{ __('Tax') }}</th>
             </tr>
             </thead>
             <tbody>
-                <tr>
-                    <!-- <td class="text-center" style="width: 150px; vertical-align: middle">
-                        <a href="{{ $booking->room->room->url }}" target="_blank">
-                            <img src="{{ RvMedia::getImageUrl($booking->room->room->image, 'thumb', false, RvMedia::getDefaultImage()) }}" alt="{{ $booking->room->room->name }}" width="140">
-                        </a>
-                    </td> -->
-                    <td style="vertical-align: middle"><a href="{{ $booking->room->room->url }}" target="_blank">{{ $booking->room->room->name }}</a></td>
-                    <td class="text-center" style="vertical-align: middle">{{ $booking->room->start_date }}</td>
-                    <td class="text-center" style="vertical-align: middle">{{ $booking->room->end_date }}</td>
-                    <!-- <td class="text-center" style="vertical-align: middle">{{ $booking->room->number_of_rooms }}</td> -->
-                    <td class="text-center" style="vertical-align: middle"><strong>{{ format_price($booking->room->price) }}</strong></td>
-                    <td class="text-center" style="vertical-align: middle"><strong>{{ format_price($booking->tax_amount) }}</strong></td>
-                </tr>
+                @foreach($booking->rooms as $room)
+                    <tr>
+                        <td style="vertical-align: middle"><a href="{{ $room->room->url }}" target="_blank">{{ $room->room->name }}</a></td>
+                        <td class="text-center" style="vertical-align: middle">{{ $room->start_date }}</td>
+                        <td class="text-center" style="vertical-align: middle">{{ $room->end_date }}</td>
+                        <td class="text-center" style="vertical-align: middle">{{ $room->number_of_rooms }}</td>
+                        <td class="text-center" style="vertical-align: middle"><strong>{{ format_price($room->price) }}</strong></td>
+                        <td class="text-center" style="vertical-align: middle"><strong>{{ format_price($room->tax_amount) }}</strong></td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
         <br>

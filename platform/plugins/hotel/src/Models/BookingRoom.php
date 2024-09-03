@@ -27,6 +27,8 @@ class BookingRoom extends BaseModel
         'booking_id',
         'room_id',
         'price',
+        'discount_amount',
+        'tax_amount',
         'currency_id',
         'number_of_rooms',
         'start_date',

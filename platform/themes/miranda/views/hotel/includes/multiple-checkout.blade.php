@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded',init,false);
     </div>
     <div id="selected-book-rooms">
     @foreach ($rooms as $room)
-    @include(Theme::getThemeNamespace() . '::views.hotel.includes.book-room-item', compact('room', 'checkout', 'bookings') )
+    @include(Theme::getThemeNamespace() . '::views.hotel.includes.book-room-item', compact('room', 'checkout', 'roomBookings') )
     @endforeach
     </div>
     <div style="padding: 20px; background-color: #bead8e;">
@@ -191,13 +191,13 @@ document.addEventListener('DOMContentLoaded',init,false);
             @if($checkout)
             <p>{{ __('Check-In') }}: {{ $startDate->format('d-m-Y') }}</p>
             <p>{{ __('Check-Out') }}: {{ $endDate->format('d-m-Y') }}</p>
-            <p>{{ __('Total capacity') }}: {{$max_adults}} adults + {{$max_children}} children</p>
+            <p>{{ __('Total Max Capacity') }}: {{$max_adults}} adults + {{$max_children}} children</p>
             <p>{{ __('Tax') }}: {{ format_price($taxAmount) }}</p>
             <p>{{ __('Discount') }}: -{{ format_price($discount_amount) }}</p>
             @else
             <p>{{ __('Check-In') }}: {{ request()->query('start_date', now()->format('d-m-Y')) }}</p>
             <p>{{ __('Check-Out') }}: {{ request()->query('end_date', now()->addDay()->format('d-m-Y')) }}</p>
-            <p>{{ __('Total capacity') }}: <span id="span-max-adults"></span> adults + <span id="span-max-children"></span> children</p>
+            <p>{{ __('Total Max Capacity') }}: <span id="span-max-adults"></span> adults + <span id="span-max-children"></span> children</p>
             @endif
         </div>
     </div>

@@ -22,6 +22,7 @@ class BookingAddress extends BaseModel
      * @var array
      */
     protected $fillable = [
+        'nik',
         'first_name',
         'last_name',
         'phone',

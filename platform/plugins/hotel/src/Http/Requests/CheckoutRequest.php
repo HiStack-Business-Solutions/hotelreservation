@@ -15,9 +15,10 @@ class CheckoutRequest extends Request
     public function rules()
     {
         return [
-            'room_id'          => 'required',
+            'room_id'          => $this->input('multiple_booking') ? 'nullable' : 'required',
             'start_date'       => 'required:date_format:d-m-Y',
             'end_date'         => 'required:date_format:d-m-Y',
+            'nik'              => 'required',
             'first_name'       => 'required',
             'last_name'        => 'required',
             'email'            => 'required',

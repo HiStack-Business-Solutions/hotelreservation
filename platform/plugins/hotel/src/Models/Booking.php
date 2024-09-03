@@ -8,6 +8,7 @@ use Botble\Hotel\Enums\BookingStatusEnum;
 use Botble\Payment\Models\Payment;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Booking extends BaseModel
@@ -34,6 +35,7 @@ class Booking extends BaseModel
         'transaction_id',
         'tax_amount',
         'discount',
+        'discount_amount'
     ];
 
     /**
@@ -74,7 +76,13 @@ class Booking extends BaseModel
     {
         return $this->hasOne(BookingRoom::class, 'booking_id')->withDefault();
     }
-
+    /**
+     * @return HasMany
+     */
+    public function rooms(): HasMany
+    {
+        return $this->hasMany(BookingRoom::class, 'booking_id');
+    }
     /**
      * @return BelongsTo
      */
