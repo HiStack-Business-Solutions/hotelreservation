@@ -18,18 +18,8 @@ class BookingForm extends FormAbstract
     public function buildForm()
     {
         $booking = $this->getModel();
-        $fileExists = Storage::exists('public/payment_proofs/' . $booking->payment_proof);
-        if ($booking->payment_proof && $fileExists) {
-            $filePath = 'public/payment_proofs/' . $booking->payment_proof;
-            $fileContents = Storage::get($filePath);
-            $base64 = base64_encode($fileContents);
-            $mimeType = Storage::mimeType($filePath);
-    
-            // Pass base64 string and mime type to view
-            $booking->payment_proof_base64 = 'data:' . $mimeType . ';base64,' . $base64;
-        } else {
-            $booking->payment_proof_base64 = null;
-        }
+        $payment = $booking->payment;
+        $fileExists = Storage::exists('public/payment_proofs/' . $payment->payment_proof);
         $showUploadForm = false;
         $this
             ->setupModel(new Booking)

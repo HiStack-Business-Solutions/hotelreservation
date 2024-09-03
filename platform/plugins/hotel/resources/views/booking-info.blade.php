@@ -19,7 +19,7 @@
             </div>
             <div class="col-md-6">
                 <p>{{ __('Address') }}: <i>{{ $booking->address->id ? $booking->address->address . ', ' . $booking->address->city . ', ' . $booking->address->state . ', ' . $booking->address->country . ', ' . $booking->address->zip : 'N/A' }}</i></p>
-                <p>{{ __('Room') }}: <i>@if ($booking->room->room->id) <a href="{{ $booking->room->room->url }}" target="_blank">{{ $booking->room->room->name }}</a> @else N/A @endif</i></p>
+                @if(count($booking->rooms) == 1)<p>{{ __('Room') }}: <i>@if ($booking->room->room->id) <a href="{{ $booking->room->room->url }}" target="_blank">{{ $booking->room->room->name }}</a> @else N/A @endif</i></p>@endif
                 <p><strong>{{ __('Start Date') }}</strong>: <i>{{ $booking->room->start_date }}</i></p>
                 <p><strong>{{ __('End Date') }}</strong>: <i>{{ $booking->room->end_date }}</i></p>
                 <p><strong>{{ __('Arrival Time') }}</strong>: <i>{{ $booking->arrival_time }}</i></p>
@@ -123,14 +123,6 @@
             </div>
         @endif
     </form>
-    @endif
-    @if(Auth::check() && $booking->payment_proof_base64)
-        <div style="position: relative; display: flex; justify-content: center; margin: 20px;">
-            <label for="payment_proof_image" style="position: absolute; top: 0; left: 0; background-color: rgba(255, 255, 255, 0.7); padding: 5px; border-radius: 3px; font-weight: bold;">
-                File Bukti Transfer (Preview)
-            </label>
-            <img name="payment_proof_image" id="payment_proof_image" src="{{ $booking->payment_proof_base64 }}" alt="Payment Proof" style="max-width: 600px; height: auto; margin-top: 30px;">
-        </div>
     @endif
 @endif
 

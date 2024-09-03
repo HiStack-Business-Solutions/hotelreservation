@@ -14,10 +14,12 @@ use Botble\Hotel\Http\Requests\BookingRequest;
 use Botble\Hotel\Mails\BookingMailer;
 use Botble\Hotel\Repositories\Interfaces\BookingInterface;
 use Botble\Hotel\Tables\BookingTable;
+use Botble\Payment\Enums\PaymentStatusEnum;
 use Exception;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Throwable;
 
@@ -76,19 +78,38 @@ class BookingController extends BaseController
         $booking = $this->bookingRepository->findOrFail($id);
 
         $booking->fill($request->input());
-        if (!$booking->payment_proof && $booking->status == BookingStatusEnum::COMPLETED()) 
+        if (!$booking->payment->payment_proof && !in_array($booking->status, [BookingStatusEnum::PENDING(), BookingStatusEnum::PROCESSING(), BookingStatusEnum::CANCELLED()]) ) 
         {
             return $response
                 ->setError(true)
                 ->setMessage('Perlu Bukti Transfer');
         }
+        if (!$booking->payment->payment_proof && $booking->status == BookingStatusEnum::PROCESSING() && $booking->payment->payment_channel == 'down_payment') {
+            return $response
+                ->setError(true)
+                ->setMessage('Perlu Bukti Transfer DP');
+        }
+        if ($booking->status == BookingStatusEnum::LUNAS() && $booking->payment->status != PaymentStatusEnum::COMPLETED()) {
+            return $response
+                ->setError(true)
+                ->setMessage('Payment Status belum COMPLETED');
+        }
         $this->bookingRepository->createOrUpdate($booking);
+        $paymentProofPath = 'public/payment_proofs/' . $booking->payment->payment_proof;
+        if ($booking->status == BookingStatusEnum::PROCESSING() && $booking->payment->payment_channel == 'down_payment') {
+            Storage::move($paymentProofPath, $paymentProofPath . '-downpayment');
+        }
 
         try {
-            if (!$booking->is_payment_emailed && $booking->status == BookingStatusEnum::COMPLETED()) {
+            if (!$booking->is_payment_emailed && $booking->status == BookingStatusEnum::LUNAS()) {
                 BookingMailer::sendFullPaymentEmail($booking);
                 $booking->is_payment_emailed = true;
                 $bookingRepository->update(['id'=> $booking->id], ['is_payment_emailed' => true]);
+            }
+            if (!$booking->is_dp_payment_emailed && $booking->payment->payment_channel == 'down_payment' && $booking->status == BookingStatusEnum::PROCESSING()) {
+                BookingMailer::sendDownPaymentEmail($booking);
+                $booking->is_dp_payment_emailed = true;
+                $bookingRepository->update(['id'=> $booking->id], ['is_dp_payment_emailed' => true]);
             }
         } catch (Exception $err) {
             Log::error($err);

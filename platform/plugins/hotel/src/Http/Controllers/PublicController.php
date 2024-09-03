@@ -738,8 +738,8 @@ class PublicController extends Controller
         $path = $file->storeAs('public/payment_proofs', $filename);
 
         // Store the file path in the database associated with the booking
-        $booking->payment_proof = $filename;
-        $booking->save();
+        $booking->payment->payment_proof = $filename;
+        $booking->payment->save();
 
         return back()->with('success', 'Payment proof uploaded successfully.');
     }

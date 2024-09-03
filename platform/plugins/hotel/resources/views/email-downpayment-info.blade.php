@@ -104,11 +104,10 @@
                   <p style="font-family: Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">Dear {{ $booking->address->first_name }} {{ $booking->address->last_name }},</p>
 
                   <p style="font-family: Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">
-                    {{ 
-                      $booking->status == \Botble\Hotel\Enums\BookingStatusEnum::COMPLETED() ?
-                      'Congratulations! Your booking was accepted by our admin. We are pleased to welcome you at the designated details below' :
-                      'We are pleased to confirm your booking with Natura Ecopark. Please find the details of your reservation below'
-                     }}
+                  Your DP (Down Payment) booking was accepted by our admin.
+                  </p>
+                  <p style="font-family: Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">
+                  We are pleased to confirm your booking with Natura Ecopark. Please find the details of your reservation below.
                   </p>
                   <div id="printableArea">
                       <center>
@@ -130,7 +129,7 @@
                           </div>
                           <div class="col-md-6">
                               <p>{{ __('Address') }}: <i>{{ $booking->address->id ? $booking->address->address . ', ' . $booking->address->city . ', ' . $booking->address->state . ', ' . $booking->address->country . ', ' . $booking->address->zip : 'N/A' }}</i></p>
-                              @if(count($booking->rooms) == 1)<p>{{ __('Room') }}: <i>@if ($booking->room->room->id) <a href="{{ $booking->room->room->url }}" target="_blank">{{ $booking->room->room->name }}</a> @else N/A @endif</i></p>@endif
+                              <p>{{ __('Room') }}: <i>@if ($booking->room->room->id) <a href="{{ $booking->room->room->url }}" target="_blank">{{ $booking->room->room->name }}</a> @else N/A @endif</i></p>
                               <p><strong>{{ __('Start Date') }}</strong>: <i>{{ $booking->room->start_date }}</i></p>
                               <p><strong>{{ __('End Date') }}</strong>: <i>{{ $booking->room->end_date }}</i></p>
                               <p><strong>{{ __('Arrival Time') }}</strong>: <i>{{ $booking->arrival_time }}</i></p>
@@ -140,64 +139,15 @@
                       @if ($booking->requests)
                           <p style="margin-bottom: 10px;"><strong>{{ __('Requests') }}</strong>: {{ $booking->requests }}</p>
                       @endif
-                      <p><strong>{{ __('Room(s)') }}</strong>:</p>
-                      <table class="table table-bordered">
-                          <thead>
-                          <tr>
-                              <!-- <th class="text-center">{{ __('Image') }}</th> -->
-                              <th>{{ __('Name') }}</th>
-                              <th class="text-center">{{ __('Checkin Date') }}</th>
-                              <th class="text-center">{{ __('Checkout Date') }}</th>
-                              <!-- <th class="text-center">{{ __('Number of rooms') }}</th> -->
-                              <th class="text-center">{{ __('Price') }}</th>
-                              <th class="text-center">{{ __('Tax') }}</th>
-                          </tr>
-                          </thead>
-                          <tbody>
-                              @foreach($booking->rooms as $room)
-                                <tr>
-                                    <td style="vertical-align: middle"><a href="{{ $room->room->url }}" target="_blank">{{ $room->room->name }}</a></td>
-                                    <td class="text-center" style="vertical-align: middle">{{ $room->start_date }}</td>
-                                    <td class="text-center" style="vertical-align: middle">{{ $room->end_date }}</td>
-                                    <td class="text-center" style="vertical-align: middle">{{ $room->number_of_rooms }}</td>
-                                    <td class="text-center" style="vertical-align: middle"><strong>{{ format_price($room->price) }}</strong></td>
-                                    <td class="text-center" style="vertical-align: middle"><strong>{{ format_price($room->tax_amount) }}</strong></td>
-                                </tr>
-                              @endforeach
-                          </tbody>
-                      </table>
-                      <br>
-                      @if ($booking->services->count())
-                          <p><strong>{{ __('Services') }}</strong>:</p>
-                          <table class="table table-bordered">
-                              <thead>
-                              <tr>
-                                  <th>{{ __('Name') }}</th>
-                                  <th class="text-center">{{ __('Price') }}</th>
-                                  <th class="text-center">{{ __('Total') }}</th>
-                              </tr>
-                              </thead>
-                              <tbody>
-                              @foreach($booking->services as $service)
-                                  <tr>
-                                      <td style="vertical-align: middle">
-                                          {{ $service->name }}
-                                      </td>
-                                      <td class="text-center" style="vertical-align: middle">{{ format_price($service->price) }} x {{ $booking->room->number_of_rooms }}</td>
-                                      <td class="text-center" style="vertical-align: middle">{{ format_price($service->price * $booking->room->number_of_rooms) }}</td>
-                                  </tr>
-                              @endforeach
-                              </tbody>
-                          </table>
-                          <br>
-                      @endif
                       <br>
                       <p><strong>{{ __('Discount') }}</strong>: <span class="text-danger">{{ $booking->discount}}% <i>(exclude Service)</i></span></p>
                       <p><strong>{{ __('Total Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->amount) }}</span></p>
+                      <p><strong>{{ __('Paid DP Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->amount) }}</span></p>
+                      <p><strong>{{ __('Remaining Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->amount) }}</span></p>
                       <p><strong>{{ __('Payment method') }}</strong>: {{ $booking->payment->id ? $booking->payment->payment_channel->label() : 'N/A' }}</p>
                   </div>
                   
-                  <p><strong>{{ __('Payment status') }}</strong>: {!! $booking->status ? $booking->status->toHtml() : \Botble\Hotel\Enums\BookingStatusEnum::COMPLETED()->toHtml() !!}</p>
+                  <p><strong>{{ __('Payment status') }}</strong>: {!! $booking-payment ? $booking-payment->status->toHtml() : \Botble\Payment\Enums\PaymentStatusEnum::PENDING()->toHtml() !!}</p>
 
                   <p style="font-family: Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">If you have any questions or need to make changes to your reservation, please do not hesitate to contact us at [Contact Information].</p>
 

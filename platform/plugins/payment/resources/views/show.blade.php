@@ -25,6 +25,17 @@
                         {!! $detail !!}
                     </div>
                 </div>
+                
+                <div class="widget meta-boxes">
+                    <div class="widget-title">
+                        <h4>
+                            <span>File Bukti Transfer (Preview)</span>
+                        </h4>
+                    </div>
+                    <div class="widget-body">
+                        @include('plugins/hotel::payment-proof-preview', compact('payment'))
+                    </div>
+                </div>
                 @php do_action(BASE_ACTION_META_BOXES, 'advanced', $payment) @endphp
             </div>
             <div class="col-md-3 right-sidebar">

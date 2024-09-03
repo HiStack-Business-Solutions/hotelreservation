@@ -25,6 +25,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Throwable;
 
@@ -262,6 +263,24 @@ class PaymentController extends Controller
             Arr::forget($paymentStatuses, PaymentStatusEnum::PENDING);
         }
 
+        $filePath = 'public/payment_proofs/' . $payment->payment_proof;
+        $getImage = function($filePath) use($payment) {
+            if (!$payment->payment_proof) {
+                return null;
+            }
+            if (!Storage::exists($filePath)) {
+                return null;
+            }
+            $fileContents = Storage::get($filePath);
+            $base64 = base64_encode($fileContents);
+            $mimeType = Storage::mimeType($filePath);
+            
+            // Pass base64 string and mime type to view
+            return 'data:' . $mimeType . ';base64,' . $base64;
+        };
+        $payment->payment_proof_base64 = $getImage($filePath);
+        $payment->payment_proof_dp_base64 = $getImage($filePath . '-downpayment');
+
         return view('plugins/payment::show', compact('payment', 'detail', 'paymentStatuses'));
     }
 
@@ -345,6 +364,11 @@ class PaymentController extends Controller
         $payment = $this->paymentRepository->findOrFail($id);
 
         $payment->status = $request->input('status');
+        if ($payment->status == PaymentStatusEnum::COMPLETED() && !$payment->payment_proof) {
+            return $response
+                ->setError(true)
+                ->setMessage('Perlu Bukti Transfer');
+        }
         $this->paymentRepository->createOrUpdate($payment);
 
         return $response
