@@ -67,10 +67,10 @@
             <div class="col-lg-4 col-md-8 col-sm-10">
                 <div class="row-lg-4 my-4">
                     <div class="room-details m-2">
-                        @include(Theme::getThemeNamespace() . '::views.hotel.includes.check-availability', array_merge(['availableForBooking' => false], compact('rooms', 'categories')) )
+                        @include(Theme::getThemeNamespace() . '::views.hotel.includes.check-availability', array_merge(['availableForBooking' => false], compact('categories')) )
                     </div>
                     <div class="sidebar m-2">
-                        @include(Theme::getThemeNamespace() . '::views.hotel.includes.multiple-checkout', array_merge(['availableForBooking' => false], compact('categories')) )
+                        @include(Theme::getThemeNamespace() . '::views.hotel.includes.multiple-checkout', array_merge(['availableForBooking' => false, 'checkout' => false, 'bookings'=> []], compact('rooms', 'categories')) )
                     </div>
                 </div>
             </div>

@@ -112,7 +112,7 @@ async function init() {
     }
     
     let form = document.getElementById("multi-booking");
-    if (bookings && Object.keys(bookings).filter(x => bookings[x] > 0).length > 0) {
+    if ('{{$checkout}}' || (bookings && Object.keys(bookings).filter(x => bookings[x] > 0).length > 0)) {
         form.removeAttribute("hidden");
     }
     form.addEventListener('submit', () => {
@@ -163,18 +163,24 @@ document.addEventListener('DOMContentLoaded',init,false);
 }
          
 </style>
+@if(!$checkout)
 <form hidden action="{{route('public.booking')}}" method="post" id="multi-booking" class="animate-fadeIn rounded-lg" style="background-color: rgb(43 43 43); font-family: 'Old Standard TT', serif; color: #fff; font-size: 14px;">
     @csrf
+@else
+<div id="multi-booking" class="animate-fadeIn rounded-lg" style="background-color: rgb(43 43 43); font-family: 'Old Standard TT', serif; color: #fff; font-size: 14px;">
+@endif
+    @if(!$checkout)
     <input type="hidden" name="multiple_booking" value="true">
     <input type="hidden" name="start_date" value="{{ request()->query('start_date', now()->format('d-m-Y')) }}">
     <input type="hidden" name="end_date" value="{{ request()->query('end_date', now()->addDay()->format('d-m-Y')) }}">
     <input type="hidden" name="adults" value="{{ request()->query('adults', 0) }}">
+    @endif
     <div class="p-2" >
         <span class="rounded p-2" style="background: #696969;color: #ffffff;">Your Bookings</span>
     </div>
     <div id="selected-book-rooms">
     @foreach ($rooms as $room)
-    @include(Theme::getThemeNamespace() . '::views.hotel.includes.book-room-item', compact('room') )
+    @include(Theme::getThemeNamespace() . '::views.hotel.includes.book-room-item', compact('room', 'checkout', 'bookings') )
     @endforeach
     </div>
     <div style="padding: 20px; background-color: #bead8e;">
@@ -182,18 +188,31 @@ document.addEventListener('DOMContentLoaded',init,false);
             <p>{{ __('YOUR RESERVATION') }}</p>
         </div>
         <div>
+            @if($checkout)
+            <p>{{ __('Check-In') }}: {{ $startDate->format('d-m-Y') }}</p>
+            <p>{{ __('Check-Out') }}: {{ $endDate->format('d-m-Y') }}</p>
+            <p>{{ __('Total capacity') }}: {{$max_adults}} adults + {{$max_children}} children</p>
+            <p>{{ __('Tax') }}: {{ format_price($taxAmount) }}</p>
+            <p>{{ __('Discount') }}: -{{ format_price($discount_amount) }}</p>
+            @else
             <p>{{ __('Check-In') }}: {{ request()->query('start_date', now()->format('d-m-Y')) }}</p>
             <p>{{ __('Check-Out') }}: {{ request()->query('end_date', now()->addDay()->format('d-m-Y')) }}</p>
             <p>{{ __('Total capacity') }}: <span id="span-max-adults"></span> adults + <span id="span-max-children"></span> children</p>
-            <p>{{ __('Tax') }}: {{ 'tax' }}</p>
-            <p>{{ __('Discount') }}: {{ 'discount' }}%</p>
+            @endif
         </div>
     </div>
+    @if($checkout)
     <div class="pb-20 pt-20 text-center" style="font-size: 30px; background-color: #151516;">
-        <p>{{ __('Total') }}: <span class="total-amount-text">{{ 'total price' }}</span></p>
+        <p>{{ __('Total') }}: <span class="total-amount-text">@if($checkout){{ format_price($total) }} @else - @endif</span></p>
     </div>
-    
+    @endif
+    @if(!$checkout)
     <div class="input-group">
         <button type="submit" class="self-align-center main-btn btn-filled add-booking-btn col p-3 m-3">{{ __('Book All Now') }}</button>
     </div>
+    @endif
+@if(!$checkout)
+</form>
+@else
 </div>
+@endif

@@ -46,13 +46,21 @@
                 <div class="booking-form-body room-details">
                     <form action="{{ route('public.booking.checkout') }}" class="booking-form-main payment-checkout-form" method="POST">
                         @csrf
+                        <input type="hidden" name="multiple_booking" value="{{ boolval($multiBook) }}">
                         <input type="hidden" name="token" value="{{ $token }}">
                         <input type="hidden" name="amount" value="{{ $total }}">
+                        @if($room)
                         <input type="hidden" name="room_id" value="{{ $room->id }}">
+                        @else
+                            @foreach($rooms as $r)
+                            <input type="hidden" name="rooms[{{$r->id}}]" value="{{ $bookings[$r->id] }}">
+                            @endforeach
+                        @endif
                         <input type="hidden" name="start_date" value="{{ $startDate->format('d-m-Y') }}">
                         <input type="hidden" name="end_date" value="{{ $endDate->format('d-m-Y') }}">
                         <input type="hidden" name="adults" value="{{ $adults }}">
                         <input type="hidden" name="discount" value="{{ $discount }}">
+                        <input type="hidden" name="discount_amount" value="{{ $discount_amount }}">
                         <input type="hidden" name="currency" value="{{ strtoupper(get_application_currency()->title) }}">
                         <input type="hidden" name="currency_id" value="{{ get_application_currency_id() }}">
                         <input type="hidden" name="callback_url" value="{{ route('public.payment.paypal.status') }}">
@@ -95,7 +103,14 @@
                         <div class="room-booking-form p-0">
 
                             <p class="mb-20">{{ __('Required fields are followed by *') }}</p>
-
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group input-group input-group-two mb-20">
+                                            <label for="txt-first-name">NIK <span class="required">*</span></label>
+                                            <input type="text" name="nik" id="txt-nik" required value="{{ old('nik') }}">
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group input-group input-group-two mb-20">
@@ -239,8 +254,9 @@
                                             <label for="payment_paypal" class="text-left">{{ setting('payment_paypal_name', trans('plugins/payment::payment.payment_via_paypal')) }}</label>
                                         </li>
                                     @endif
-
+                                    @if($room)
                                     {!! apply_filters(PAYMENT_FILTER_ADDITIONAL_PAYMENT_METHODS, null, ['amount' => $total, 'currency' => strtoupper(get_application_currency()->title), 'name' => $room->name]) !!}
+                                    @endif
                                     @php
                                         $dateNow = strtotime(date('Y-m-d'));
                                         $startDateInput = strtotime($startDate->format('Y-m-d'));
@@ -310,6 +326,9 @@
             <!-- Blog Sidebar -->
             <div class="col-lg-4 col-md-8 col-sm-10">
                 <div class="sidebar">
+                    @if ($multiBook)
+                        @include(Theme::getThemeNamespace() . '::views.hotel.includes.multiple-checkout', compact('checkout', 'rooms', 'bookings') )
+                    @else if($room) 
                     <div style="font-family: 'Old Standard TT', serif; color: #fff; font-size: 14px;">
                         <div style="position: relative">
                             <span class="room-type" style="background-color: #bead8e; color: #fff; padding: 3px 5px; text-transform: uppercase; position: absolute; top: 15px; left: 15px;">{{ $room->name }}</span>
@@ -331,6 +350,8 @@
                             <p>{{ __('Total') }}: <span class="total-amount-text">{{ format_price($total) }}</span></p>
                         </div>
                     </div>
+
+                    @endif
                 </div>
             </div>
         </div>

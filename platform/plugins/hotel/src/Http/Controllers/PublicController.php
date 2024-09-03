@@ -28,11 +28,13 @@ use Botble\Payment\Services\Gateways\StripePaymentService;
 use Botble\SeoHelper\SeoOpenGraph;
 use Botble\Slug\Repositories\Interfaces\SlugInterface;
 use Carbon\Carbon;
+use DateTime;
 use EmailHandler;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -67,7 +69,7 @@ class PublicController extends Controller
             abort(404);
         }
         $request->headers->set('no_admin_bar', true);
-        return view(Theme::getThemeNamespace() . '::views.hotel.includes.book-room-item', compact('room'))->render();
+        return view(Theme::getThemeNamespace() . '::views.hotel.includes.book-room-item', array_merge(['checkout' => false, 'bookings' => []], compact('room')))->render();
     }
     /**
      * @param Request $request
@@ -272,15 +274,24 @@ class PublicController extends Controller
             'end_date'   => 'required:date_format:d-m-Y',
             'adults'     => 'required',
         ]);
-
-        $room = $roomRepository->getFirstBy(
-            ['id' => $request->input('room_id')],
-            ['*'],
-            ['currency', 'category']
-        );
-
-        if (!$room) {
-            abort(404);
+        $multiBook = boolval($request["multiple_booking"]);
+        if (!$multiBook) { 
+            $room = $roomRepository->getFirstBy(
+                ['id' => $request->input('room_id')],
+                ['*'],
+                ['currency', 'category']
+            );
+            
+            if (!$room) {
+                abort(404);
+            }
+        } else {
+            $bookings = $request["rooms"];
+            $roomIds = array_keys($bookings);
+            $rooms = $roomRepository->getByWhereIn("id", $roomIds);
+            if (count($rooms) != count($bookings)) {
+                abort(404);
+            }
         }
 
         $token = md5(Str::random(40));
@@ -289,7 +300,155 @@ class PublicController extends Controller
 
         return $response->setNextUrl(route('public.booking.form', $token));
     }
+    private function createNightDates(string $startDate, int $nights) {
+        $date = new DateTime($startDate);
+        $nightDates = [];
+        for ($i = 0; $i < $nights; $i++) {
+            // Output the current date in d-m-Y format
+            $nightDates[] = $date->format('d-m-Y');
+        
+            // Modify the date, e.g., add 1 day
+            $date->modify('+1 day');
+        }
+        return $nightDates;
+    }
+    private function calculateRoomPrice(Room $room, string $nightDate, ServiceInterface $serviceRepository) {
+        $filteredRoomDates = $room->roomDatesTwo->filter(function($roomDate) use ($room, $nightDate) {
+            return $roomDate->room_id == $room['id'] && Carbon::parse($roomDate->start_date)->format('d-m-Y') == $nightDate;
+        })->first();
+        
+        // dd($room);
+        if($filteredRoomDates != null){
+            $roomDate = $filteredRoomDates;
+            $room->price = $roomDate->price;
+            $taxAmount = $room->tax->percentage * $room->price / 100;
+            $price = $room->price;
+            $services = $serviceRepository->allBy(['status' => BaseStatusEnum::PUBLISHED]);
+            $discount = $roomDate['discount'];
+            if($discount > 0){
+                $price = strval($price * (1 - $discount / 100));
+                $discount_amount = $discount * $price;
+                $taxAmount = $room->tax->percentage * $price / 100;
+                $price = $price + $taxAmount;
+            }
+        }
+        else{
+            $discount = 0;
+            $discount_amount = 0;
+            $taxAmount = $room->tax->percentage * $room->price / 100;
+            $price = $room->price + $taxAmount;
+            $services = $serviceRepository->allBy(['status' => BaseStatusEnum::PUBLISHED]);
+        }
+        return [
+            'discount' => $discount,
+            'discount_amount' => $discount_amount,
+            'taxAmount' => $taxAmount,
+            'services' => $services,
+            'price' => $price
+        ];
+    }
+    
+    private function getMultiBooking($sessionData, RoomInterface $roomRepository) {
+        $bookings = Arr::get($sessionData, 'rooms');
+        if (!$bookings) {
+            $bookings = [];
+        }
+        $bookings = collect($bookings)->map(function ($x) { return intval($x); })->all();
+        $rooms = new Collection();
+        if ($bookings) {
+            $roomIds = array_filter(array_keys($bookings), function($x) use($bookings) { return $bookings[$x] > 0; });
+            $rooms = $roomRepository->getByWhereIn("id", $roomIds);
+        }
+        return [
+            'bookings' => $bookings,
+            'rooms' => $rooms
+        ];
+    }
+    private function calculateBooking($sessionData, ServiceInterface $serviceRepository, RoomInterface $roomRepository) {
+        $multiBook = boolval(Arr::get($sessionData, 'multiple_booking'));
+        $startDate = Carbon::createFromFormat('d-m-Y', Arr::get($sessionData, 'start_date'));
+        $endDate = Carbon::createFromFormat('d-m-Y', Arr::get($sessionData, 'end_date'));
+        $nights = $endDate->diffInDays($startDate);
+        $adults = Arr::get($sessionData, 'adults');
+        $adults = $adults == 0 ? 1 : $adults;
+        $room = $roomRepository->getFirstBy(
+            ['id' => Arr::get($sessionData, 'room_id')],
+            ['*'],
+            ['currency', 'category']
+        );
+        ['bookings'=> $bookings, 'rooms' => $rooms] = $this->getMultiBooking($sessionData, $roomRepository);
+        if (!$room && !$rooms) {
+            abort(404);
+        }
 
+        $nightDates = $this->createNightDates($startDate, $nights);
+        $total = 0;
+        $discount = 0;
+        $discount_amount = 0;
+        $taxAmount = 0;
+        $services = new Collection();
+        
+        $calcTotal = function(Room $room) use 
+            ($nightDates, 
+            $serviceRepository, 
+            &$total,                        
+            &$discount,
+            &$discount_amount,              
+            &$taxAmount,                
+            &$services                       
+        ) {
+            foreach ($nightDates as $nightDate) {
+                $roomPrice = $this->calculateRoomPrice($room, $nightDate, $serviceRepository);
+                $total += $roomPrice['price'];
+                $discount = $discount > $roomPrice['discount'] ? $discount : $roomPrice['discount'];
+                $discount_amount += $roomPrice['discount_amount'];
+                $taxAmount += $roomPrice['taxAmount'];
+                $services = $roomPrice['services'] ? $services->merge($roomPrice['services']) : $services;
+            }
+        };
+        
+        $max_caps = $rooms->map(function($room) use($bookings) {
+            return [
+                'max_adults' => $room->max_adults * $bookings[$room->id],
+                'max_children' => $room->max_children * $bookings[$room->id], 
+            ];
+        })->reduce(function($carry, $item) {
+            $carry['max_adults'] += $item['max_adults'];
+            $carry['max_children'] += $item['max_children'];
+            return $carry;
+        }, ['max_adults'=>0, 'max_children'=>0]);
+        $max_adults = $max_caps['max_adults'];
+        $max_children = $max_caps['max_children'];
+
+        if (!$multiBook) {
+            $rooms->push($room);
+            $bookings[$room->id] = 1;
+        }
+        foreach($rooms as $r) {
+            for($qty = 0; $qty < $bookings[$r->id]; $qty++) {
+                $calcTotal($r);
+            }
+        }
+        
+        $services = $services->unique("id");
+        
+        return [
+            'discount' => $discount,
+            'discount_amount' => $discount_amount,
+            'room' => $room,
+            'rooms' => $rooms,
+            'services' => $services,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'adults' => $adults,
+            'max_adults' => $max_adults,
+            'max_children' => $max_children,
+            'total' => $total,
+            'bookings' => $bookings,
+            'taxAmount' => $taxAmount,
+            'multiBook' => $multiBook
+        ];
+    }
     /**
      * @param string $token
      * @param RoomInterface $roomRepository
@@ -330,55 +489,39 @@ class PublicController extends Controller
             ->container('footer')
             ->add('payment-js', asset('vendor/core/plugins/payment/js/payment.js'), ['jquery'], [], '1.0.0');
 
-        $startDate = Carbon::createFromFormat('d-m-Y', Arr::get($sessionData, 'start_date'));
-        $endDate = Carbon::createFromFormat('d-m-Y', Arr::get($sessionData, 'end_date'));
-        $nights = $endDate->diffInDays($startDate);
-        $adults = Arr::get($sessionData, 'adults');
-        $room = $roomRepository->getFirstBy(
-            ['id' => Arr::get($sessionData, 'room_id')],
-            ['*'],
-            ['currency', 'category']
-        );
-        if (!$room) {
-            abort(404);
-        }
-
-        // dd(Arr::get($sessionData, 'start_date'));
-        $filteredRoomDates = $room->roomDatesTwo->filter(function($roomDate) use ($room, $sessionData) {
-            return $roomDate->room_id == $room['id'] && Carbon::parse($roomDate->start_date)->format('d-m-Y') == Arr::get($sessionData, 'start_date');
-        })->first();
-
-        // dd($room);
-        if($filteredRoomDates != null){
-            $roomDate = $filteredRoomDates;
-            $room->price = $roomDate->price;
-            $taxAmount = $room->tax->percentage * $room->price / 100;
-            $total = $room->price * $nights;
-            $services = $serviceRepository->allBy(['status' => BaseStatusEnum::PUBLISHED]);
-            $discount = $roomDate['discount'];
-            if($discount > 0){
-                $total = strval($total * (1 - $discount / 100));
-                $taxAmount = $room->tax->percentage * $total / 100;
-                $total = $total + $taxAmount;
-            }
-        }
-        else{
-            $discount = 0;
-            $taxAmount = $room->tax->percentage * $room->price / 100;
-            $total = $room->price * $nights + $taxAmount;
-            $services = $serviceRepository->allBy(['status' => BaseStatusEnum::PUBLISHED]);
-        }
-        return Theme::scope('hotel.booking', compact(
+        [
+            'discount' => $discount,
+            'discount_amount' => $discount_amount,
+            'room' => $room,
+            'rooms' => $rooms,
+            'services' => $services,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'adults' => $adults,
+            'max_adults' => $max_adults,
+            'max_children' => $max_children,
+            'total' => $total,
+            'bookings' => $bookings,
+            'taxAmount' => $taxAmount,
+            'multiBook' => $multiBook
+        ] = $this->calculateBooking($sessionData, $serviceRepository, $roomRepository);
+        
+        return Theme::scope('hotel.booking', array_merge(['multiBook'=>$multiBook, 'checkout' => true], compact(
                 'discount',
+                'discount_amount',
                 'room',
+                'rooms',
                 'services',
                 'startDate',
                 'endDate',
                 'adults',
+                'max_adults',
+                'max_children',
                 'total',
+                'bookings',
                 'taxAmount',
                 'token'
-            )
+            ))
         )->render();
     }
 
@@ -412,43 +555,33 @@ class PublicController extends Controller
         $room = $roomRepository->findOrFail($request->input('room_id'));
         $booking = $bookingRepository->getModel();
         $booking->fill($request->input());
-
-        $startDate = Carbon::createFromFormat('d-m-Y', $request->input('start_date'));
-        $endDate = Carbon::createFromFormat('d-m-Y', $request->input('end_date'));
-        $nights = $endDate->diffInDays($startDate);
-        // dd($booking);
-
-        // dd(Arr::get($sessionData, 'start_date'));
-        $filteredRoomDates = $room->roomDatesTwo->filter(function($roomDate) use ($room, $request) {
-            return $roomDate->room_id == $room['id'] && Carbon::parse($roomDate->start_date)->format('d-m-Y') == Arr::get($request, 'start_date');
-        })->first();
-
-        if($filteredRoomDates != null){
-            $roomDate = $filteredRoomDates;
-            $room->price = $roomDate->price;
-            $booking->tax_amount = $room->tax->percentage * $room->price / 100;
-            $booking->amount = $room->price * $nights;
-            $discount = $roomDate['discount'];
-            if($discount > 0){
-                $booking->amount = strval($booking->amount * (1 - $discount / 100));
-                $booking->tax_amount = $room->tax->percentage * $booking->amount / 100;
-                $booking->amount = $booking->amount + $booking->tax_amount;
-            }
-        }
-        else{
-            $discount = 0;
-            $booking->tax_amount = $room->tax->percentage * $room->price / 100;
-            $booking->amount = $room->price * $nights + $booking->tax_amount;
-        }
+        
+        [
+            'discount' => $discount,
+            'discount_amount' => $discount_amount,
+            'room' => $room,
+            'rooms' => $rooms,
+            'services' => $services,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'adults' => $adults,
+            'max_adults' => $max_adults,
+            'max_children' => $max_children,
+            'total' => $total,
+            'bookings' => $bookings,
+            'taxAmount' => $taxAmount,
+            'multiBook' => $multiBook
+        ] = $this->calculateBooking($request->except(['_token']), $serviceRepository, $roomRepository);
+        
 
         // $taxAmount = $room->tax->percentage * $room->price / 100;
         // $booking->amount = $room->price * $nights + $taxAmount;
         // $booking->tax_amount = $taxAmount;
         $booking->transaction_id = $this->uuidv4();
 
-        if ($request->input('services')) {
+        if ($services) {
             $services = $serviceRepository->getModel()
-                ->whereIn('id', $request->input('services'))
+                ->whereIn('id', $services)
                 ->get();
 
             foreach ($services as $service) {
