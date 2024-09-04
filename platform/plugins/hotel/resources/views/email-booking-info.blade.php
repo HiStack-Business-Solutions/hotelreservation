@@ -148,7 +148,7 @@
                               <th>{{ __('Name') }}</th>
                               <th class="text-center">{{ __('Checkin Date') }}</th>
                               <th class="text-center">{{ __('Checkout Date') }}</th>
-                              <!-- <th class="text-center">{{ __('Number of rooms') }}</th> -->
+                              <th class="text-center">{{ __('Number of rooms') }}</th>
                               <th class="text-center">{{ __('Price') }}</th>
                               <th class="text-center">{{ __('Tax') }}</th>
                           </tr>

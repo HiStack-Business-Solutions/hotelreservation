@@ -123,7 +123,7 @@ class BookingController extends BaseController
                         $roomDate->room_id = $id;
                         $room = $bRoom->room;
                         $roomDate->price = $room->price;
-                        $roomDate->discount = $room->discount;
+                        $roomDate->discount = $room->discount ? $room->discount : 0;
                         $roomDate->number_of_rooms = $room->number_of_rooms;
                         $roomDate->active = true;
                         $roomDate->start_date = date('Y-m-d H:i:s', $i);

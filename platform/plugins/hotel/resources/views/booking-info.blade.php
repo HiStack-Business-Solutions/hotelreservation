@@ -85,7 +85,7 @@
         <p><strong>{{ __('Total Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->amount) }}</span></p>
         <p><strong>{{ __('Payment method') }}</strong>: {{ $booking->payment->id ? $booking->payment->payment_channel->label() : 'N/A' }}</p>
     </div>
-    <p><strong>{{ __('Payment status') }}</strong>: {!! $booking->payment->id ? $booking->payment->status->toHtml() : \Botble\Payment\Enums\PaymentStatusEnum::PENDING()->toHtml() !!}</p>
+    <p><strong>{{ __('Payment status') }}</strong>: <a @if(Auth::check()) href="{{route('payment.show', $booking->payment->id)}}"@endif>{!! $booking->payment->id ? $booking->payment->status->toHtml() : \Botble\Payment\Enums\PaymentStatusEnum::PENDING()->toHtml() !!}</a></p>
 
     <div style="display: flex; justify-content: flex-end;">
         <button onclick="printDiv('printableArea')" style="background-color: #007bff; color: white; border: none; padding: 8px 20px; border-radius: 5px; display: flex; align-items: center; margin-right: 10px;">
