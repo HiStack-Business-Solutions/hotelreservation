@@ -52,13 +52,7 @@
         <h4 class="title"><a href="{{ $room->url }}">{{ $room->name }}</a></h4>
         <break class="mb-10"><a>Room Available : </a>
             <a href="{{ $room->url }}">
-                @if ($filteredDates->isEmpty())
-                    {{ $room->number_of_rooms }}
-                @else
-                    @foreach ($filteredDates as $roomss)
-                        {{ !empty($roomss['number_of_rooms']) ? $roomss['number_of_rooms'] : $room->number_of_rooms }}
-                    @endforeach
-                @endif  
+                {{ $roomBookings[$room->id]['maxRooms'] }}
             </a>
         </break>
         <br class="mb-10"><a>Capacity : </a>
@@ -85,20 +79,29 @@
     <input type="hidden" name="start_date" value="{{ request()->query('start_date', now()->format('d-m-Y')) }}">
     <input type="hidden" name="end_date" value="{{ request()->query('end_date', now()->addDay()->format('d-m-Y')) }}">
     <input type="hidden" name="adults" value="{{ request()->query('adults', 0) }}">
-    <button type="button" class="rounded col my-1 main-btn btn-filled add-booking-btn" onclick="plus('{{$room->id}}')">
+    @php
+    
+    @endphp
+    @if($roomBookings[$room->id]['maxRooms'] <= 0 || !$roomBookings[$room->id]['isAvailable'])
+    <button type="button" class="rounded col my-1 main-btn not-available-btn text-wrap">
+        {{ $roomBookings[$room->id]['isAvailable'] ? 'Fully Booked' : 'Room ini tidak tersedia (Not in Availability)' }}
+    </button>
+    @else
+    <button type="button" class="rounded col my-1 main-btn btn-filled add-booking-btn text-wrap" onclick="plus('{{$room->id}}')">
         {{ __("Add To Multiple Booking") }}
     </button>
-    <button type="submit" class="rounded col my-1 main-btn btn-filled booking-button">
+    <button type="submit" class="rounded col my-1 main-btn btn-filled booking-button text-wrap">
 
         @if ($filteredDates->isEmpty())
-            {{ __('Booking :price', ['price' => format_price($room->price * (isset($nights) ? $nights : 1))]) }}
+            {{ __('Book One Now :price', ['price' => format_price($room->price * (isset($nights) ? $nights : 1))]) }}
         @else
-            {!! __('Booking :price/<span style="text-decoration: line-through;">:originalPrice</span>', [
+            {!! __('Book One Now :price/<span style="text-decoration: line-through;">:originalPrice</span>', [
                 'price' => format_price($totalDiscountedPrice),
                 'originalPrice' => format_price($totalOriginalPrice)
             ]) !!}
         @endif  
     </button>
+    @endif
 </form>
         </div>
     </div>

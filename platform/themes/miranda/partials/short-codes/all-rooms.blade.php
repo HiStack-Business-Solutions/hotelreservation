@@ -10,7 +10,19 @@
         }
         .add-booking-btn:hover {
             background-color: #fff1e2bf !important;
+            color: #fff;
+        }
+        .booking-button:hover {
+            background-color: #bead8e !important;
             color: #777;
+        }
+        .not-available-btn {
+            padding: 7px 12px;
+            line-height: 20px;
+            background-color: #bead8e !important;
+            color: #fff;
+            box-shadow: none;
+            font-size: 12px;
         }
         .animate-fadeIn {
             animation: fadeIn 500ms ease-out backwards;
@@ -53,7 +65,7 @@
                 <div class="row justify-content-center room-gird-loop">
                     @foreach($rooms as $room)
                         <div class="col-sm-6">
-                            @include(Theme::getThemeNamespace() . '::views.hotel.includes.room-item', compact('room', 'nights', 'categories'))
+                            @include(Theme::getThemeNamespace() . '::views.hotel.includes.room-item', compact('room', 'nights', 'categories', 'roomBookings'))
                         </div>
                     @endforeach
                 </div>
@@ -70,7 +82,7 @@
                         @include(Theme::getThemeNamespace() . '::views.hotel.includes.check-availability', array_merge(['availableForBooking' => false], compact('categories')) )
                     </div>
                     <div class="sidebar m-2">
-                        @include(Theme::getThemeNamespace() . '::views.hotel.includes.multiple-checkout', array_merge(['availableForBooking' => false, 'checkout' => false, 'roomBookings'=> []], compact('rooms', 'categories')) )
+                        @include(Theme::getThemeNamespace() . '::views.hotel.includes.multiple-checkout', array_merge(['availableForBooking' => false, 'checkout' => false], compact('rooms', 'categories', 'roomBookings')) )
                     </div>
                 </div>
             </div>

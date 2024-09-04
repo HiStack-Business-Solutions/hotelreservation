@@ -26,13 +26,21 @@
                         <div class="col-md-6" v-show="form.active">
                             <div class="form-group">
                                 <label for="discount-input">{{ trans('plugins/hotel::room.form.discount') }}</label>
-                                <input type="number" id="discount-input" v-model="form.discount" class="form-control">
+                                <input type="number" id="discount-input" v-model="form.discount" class="form-control" value="0">
                             </div>
                         </div>
                         <div class="col-md-6" v-show="form.active">
                             <div class="form-group">
                                 <label for="number-of-rooms">{{ trans('plugins/hotel::room.form.number_of_rooms') }}</label>
                                 <input type="number" id="number-of-rooms" v-model="form.number_of_rooms" class="form-control">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6" v-show="form.active">
+                            <div class="form-group">
+                                <label for="note-to-admin">{{ trans('plugins/hotel::room.form.note_to_admin') }}</label>
+                                <textarea id="note-to-admin" v-model="form.note_to_admin" class="form-control">
+                                </textarea>
                             </div>
                         </div>
                     </div>

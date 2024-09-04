@@ -13,6 +13,8 @@ use Botble\Hotel\Forms\BookingForm;
 use Botble\Hotel\Http\Requests\BookingRequest;
 use Botble\Hotel\Mails\BookingMailer;
 use Botble\Hotel\Repositories\Interfaces\BookingInterface;
+use Botble\Hotel\Repositories\Interfaces\BookingRoomInterface;
+use Botble\Hotel\Repositories\Interfaces\RoomDateInterface;
 use Botble\Hotel\Tables\BookingTable;
 use Botble\Payment\Enums\PaymentStatusEnum;
 use Exception;
@@ -73,7 +75,7 @@ class BookingController extends BaseController
      * @param BaseHttpResponse $response
      * @return BaseHttpResponse
      */
-    public function update($id, BookingRequest $request, BaseHttpResponse $response, BookingInterface $bookingRepository)
+    public function update($id, BookingRequest $request, BaseHttpResponse $response, BookingInterface $bookingRepository, RoomDateInterface $roomDateRepository, BookingRoomInterface $bookingRoomRepository)
     {
         $booking = $this->bookingRepository->findOrFail($id);
 
@@ -98,6 +100,40 @@ class BookingController extends BaseController
         $paymentProofPath = 'public/payment_proofs/' . $booking->payment->payment_proof;
         if ($booking->status == BookingStatusEnum::PROCESSING() && $booking->payment->payment_channel == 'down_payment') {
             Storage::move($paymentProofPath, $paymentProofPath . '-downpayment');
+        }
+
+        if (!$booking->room_num_reduced && ($booking->status == BookingStatusEnum::PROCESSING() || $booking->status == BookingStatusEnum::LUNAS())) {
+            $bookingRooms = $bookingRoomRepository->allBy(['booking_id'=>$booking->id]);
+            $updated = [];
+            foreach($bookingRooms as $bRoom) {
+                for ($i = strtotime($bRoom->start_date); $i <= strtotime($bRoom->end_date); $i += 60 * 60 * 24) {
+                    $roomDate = $roomDateRepository->getFirstBy([
+                        'start_date' => date('Y-m-d', $i),
+                        'room_id'    => $bRoom->room_id
+                    ]);
+                    if (!empty($roomDate) && array_key_exists($roomDate->id, $updated)) {
+                        continue;
+                    }
+                    if (empty($roomDate)) {
+                        $roomDate = $roomDateRepository->getModel();
+                        $roomDate->room_id = $id;
+                        $room = $bRoom->room;
+                        $roomDate->price = $room->price;
+                        $roomDate->discount = $room->discount;
+                        $roomDate->number_of_rooms = $room->number_of_rooms;
+                        $roomDate->active = true;
+                        $roomDate->start_date = date('Y-m-d H:i:s', $i);
+                        $roomDate->end_date = date('Y-m-d H:i:s', $i);
+                    }
+                    
+                    $roomDate->number_of_rooms -= $bRoom->number_of_rooms;
+                    $roomDate->note_to_admin .= "\n Automatic pengurangan total room yang tersedia dari transaction ID #" . $booking->transaction_id . ".";
+        
+                    $roomDate = $roomDateRepository->createOrUpdate($roomDate);
+                    $updated[$roomDate->id] = true;
+                }
+            }
+            $bookingRepository->update(['id'=> $booking->id], ['room_num_reduced' => true]);
         }
 
         try {

@@ -126,12 +126,14 @@ class PublicController extends Controller
             'category'   => $request->input('category', empty($categories) ? 0 : $categories[0]->id)
         ];
 
-        $rooms = [];
-        foreach ($allRooms as $allRoom) {
-            if ($allRoom->isAvailableAt($condition)) {
-                $rooms[] = $allRoom;
-            }
-        }
+        // Change requirement: always return rooms
+        // $rooms = [];
+        // foreach ($allRooms as $allRoom) {
+        //     if ($allRoom->isAvailableAt($condition)) {
+        //         $rooms[] = $allRoom;
+        //     }
+        // }
+        $rooms = $allRooms->all();
 
         $categories = $roomCategoryRepository->getModel()->all();
 
@@ -140,9 +142,12 @@ class PublicController extends Controller
             ->add(__('Rooms'), route('public.rooms'));
 
         if ($request->ajax() && $request->wantsJson()) {
+            $data = '';
             foreach ($rooms as $room) {
-                $data = view(Theme::getThemeNamespace() . '::views.hotel.includes.room-item',
-                    compact('room'))->render();
+                if ($room->isAvailableAt($condition)) {
+                    $data .= view(Theme::getThemeNamespace() . '::views.hotel.includes.room-item',
+                        compact('room'))->render();
+                }
             }
 
             return $response->setData($data);
@@ -152,7 +157,6 @@ class PublicController extends Controller
         foreach ($rooms as $r) {
             $numberOfRooms[$r->id] = 0;
         }
-
         return Theme::scope('hotel.rooms', compact('rooms', 'nights', 'categories', 'numberOfRooms'))->render();
     }
 
@@ -210,7 +214,6 @@ class PublicController extends Controller
         foreach ($room->images as $image) {
             $images[] = RvMedia::getImageUrl($image, null, false, RvMedia::getDefaultImage());
         }
-
         return Theme::scope('hotel.room', compact('room', 'images', 'relatedRooms'))->render();
     }
 
@@ -324,12 +327,16 @@ class PublicController extends Controller
         
         // dd($room);
         if($filteredRoomDates != null){
+            if (!$filteredRoomDates->active) {
+                abort(404, 'Room ' . $room->name . ' is already fully booked.');
+            }
             $roomDate = $filteredRoomDates;
             $room->price = $roomDate->price;
             $taxAmount = $room->tax->percentage * $room->price / 100;
             $price = $room->price;
             $services = $serviceRepository->allBy(['status' => BaseStatusEnum::PUBLISHED]);
             $discount = $roomDate['discount'];
+            $available_rooms = $roomDate->number_of_rooms;
             if($discount > 0){
                 $price = strval($price * (1 - $discount / 100));
                 $discount_amount = $discount * $price;
@@ -343,13 +350,15 @@ class PublicController extends Controller
             $taxAmount = $room->tax->percentage * $room->price / 100;
             $price = $room->price + $taxAmount;
             $services = $serviceRepository->allBy(['status' => BaseStatusEnum::PUBLISHED]);
+            $available_rooms = $room->number_of_rooms;
         }
         return [
             'discount' => $discount,
             'discount_amount' => $discount_amount,
             'taxAmount' => $taxAmount,
             'services' => $services,
-            'price' => $price
+            'price' => $price,
+            'available_rooms' => $available_rooms
         ];
     }
     
@@ -391,6 +400,7 @@ class PublicController extends Controller
         $discount = 0;
         $discount_amount = 0;
         $taxAmount = 0;
+        $maxRoomsBooking = [];
         $services = new Collection();
         
         $calcTotal = function(Room $room) use 
@@ -400,16 +410,21 @@ class PublicController extends Controller
             &$discount,
             &$discount_amount,              
             &$taxAmount,                
-            &$services    
+            &$services,
+            $numberOfRooms
         ) {
-            $roomBooking = ['total' => 0, 'discount' => 0, 'discount_amount' => 0, 'taxAmount' => 0, 'services' => new Collection()];
+            $roomBooking = ['total' => 0, 'discount' => 0, 'discount_amount' => 0, 'taxAmount' => 0, 'services' => new Collection(), 'maxRooms' => PHP_INT_MAX];
             foreach ($nightDates as $nightDate) {
                 $roomPrice = $this->calculateRoomPrice($room, $nightDate, $serviceRepository);
+                if ($numberOfRooms[$room->id] > $roomPrice['available_rooms']) {
+                    abort(404, "Jumlah booking room melebihi available room untuk tipe " . $room->name);
+                }
                 $roomBooking['total'] += $roomPrice['price'];
                 $roomBooking['discount'] = $discount > $roomPrice['discount'] ? $discount : $roomPrice['discount'];
                 $roomBooking['discount_amount'] += $roomPrice['discount_amount'];
                 $roomBooking['taxAmount'] += $roomPrice['taxAmount'];
                 $roomBooking['services'] = $roomPrice['services'] ? $services->merge($roomPrice['services']) : $services;
+                $roomBooking['maxRooms'] = min($roomPrice['available_rooms'], $roomBooking['maxRooms']); // use the minimum strategy across all dates
             }
             $total += $roomBooking['total'];
             $discount = max($discount, $roomBooking['discount']);

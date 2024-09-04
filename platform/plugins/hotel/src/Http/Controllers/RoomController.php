@@ -224,7 +224,7 @@ class RoomController extends BaseController
                 $row->price = $price;
 
                 if (!$row->active) {
-                    $row->title = $row->event = trans('plugins/hotel::room.booked');
+                    $row->title = $row->event = trans('plugins/hotel::room.not_available');
                     $row->backgroundColor = '#fe2727';
                     $row->classNames = ['blocked-event'];
                     $row->textColor = '#fe2727';
@@ -291,6 +291,10 @@ class RoomController extends BaseController
             }
 
             $roomDate->fill($request->input());
+
+            if (empty($request->input('discount'))) {
+                $roomDate->discount = 0;
+            }
 
             $roomDate->start_date = date('Y-m-d H:i:s', $i);
             $roomDate->end_date = date('Y-m-d H:i:s', $i);

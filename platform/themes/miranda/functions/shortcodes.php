@@ -237,17 +237,47 @@ app()->booted(function () {
                 'category'   => Request::input('category', empty($categories) ? 0 : $categories[0]->id),
             ];
 
-            $rooms = [];
-            foreach ($allRooms as $allRoom) {
-                if ($allRoom->isAvailableAt($condition)) {
-                    $rooms[] = $allRoom;
-                }
-            }
-
+            // Change requirement: always return rooms
+            // $rooms = [];
+            // foreach ($allRooms as $allRoom) {
+            //     if ($allRoom->isAvailableAt($condition)) {
+            //         $rooms[] = $allRoom;
+            //     }
+            // }
+            $rooms = $allRooms->all();
 
             $nights = $endDate->diffInDays($startDate);
+            
+            $roomBookings = []; // only calculate for maxRooms
+            foreach ($rooms as $r) {
+                $date = $startDate->copy();
+                $maxRooms = PHP_INT_MAX;
+                for ($i = 0; $i < $nights; $i++) {
+                    $roomDate = $r->roomDatesTwo->filter(function($roomDate) use ($r, $date) {
+                        return $roomDate->room_id == $r['id'] && Carbon::parse($roomDate->start_date)->format('d-m-Y') == $date;
+                    })->first();
+                    
+                    if (empty($roomDate)) {
+                        $maxRooms = min($maxRooms, $r->number_of_rooms);
+                    } else {
+                        $maxRooms = min($maxRooms, $roomDate->number_of_rooms);
+                        $maxRooms = $roomDate->active ? $maxRooms : 0;
+                    }
+                    if ($maxRooms == 0) {
+                        break;
+                    }
+                    $date->modify('+1 day');
+                }
+                if ($maxRooms == PHP_INT_MAX) {
+                    $maxRooms = 0;
+                }
+                $roomBookings[$r->id] = [
+                    'maxRooms' => $maxRooms,
+                    'isAvailable' => $r->isAvailableAt($condition)
+                ];
+            }
 
-            return Theme::partial('short-codes.all-rooms', compact('rooms', 'nights', 'categories'));
+            return Theme::partial('short-codes.all-rooms', compact('rooms', 'nights', 'categories', 'roomBookings'));
         });
     }
 

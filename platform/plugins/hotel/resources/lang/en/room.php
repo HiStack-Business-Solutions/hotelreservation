@@ -1,11 +1,12 @@
 <?php
 
 return [
-    'name'      => 'Rooms',
-    'create'    => 'New room',
-    'edit'      => 'Edit room',
-    'images'    => 'Images',
-    'amenities' => 'Amenities',
+    'name'          => 'Rooms',
+    'create'        => 'New room',
+    'edit'          => 'Edit room',
+    'images'        => 'Images',
+    'amenities'     => 'Amenities',
+    'not_available' => 'Fully Booked',
     'form'      => [
         'price'             => 'Price',
         'discount'          => 'Discount',
@@ -15,6 +16,7 @@ return [
         'category'          => 'Category',
         'size'              => 'Size (m2)',
         'number_of_rooms'   => 'Number of rooms (quantity)',
+        'note_to_admin'     => 'Note',
         'number_of_beds'    => 'Number of beds',
         'room_availability' => 'Room Availability',
         'close'             => 'Close',

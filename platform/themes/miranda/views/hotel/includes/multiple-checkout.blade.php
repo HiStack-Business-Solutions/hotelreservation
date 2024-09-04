@@ -33,7 +33,10 @@ function calculateBookingMaxCaps(form) {
 async function setBookForRoom(roomid, qty) {
     let form = document.getElementById("multi-booking");
     let div = form.querySelector(`div[data-room='${roomid}']`);
-
+    let maxRooms = Number(div.getAttribute("data-room-maxrooms"));
+    if (qty > maxRooms) {
+        return;
+    }
     if (!div) {
         let resp = await fetch("{{route('public.rooms.bookitem', 'data-roomid')}}".replace("data-roomid", roomid))
         if (resp.ok) {
@@ -63,6 +66,11 @@ async function setBookForRoom(roomid, qty) {
         form.removeAttribute("hidden");
     } else if (input && qty <= 0) {
         div.setAttribute("hidden", "");
+    }
+    if (qty >= maxRooms) {
+        div.querySelector("span[data-plusbook]").setAttribute("hidden", "");
+    } else {
+        div.querySelector("span[data-plusbook]").removeAttribute("hidden");
     }
     
 	let span = div.querySelector(`span[data-qty-book='${roomid}']`);
