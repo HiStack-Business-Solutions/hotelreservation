@@ -16,6 +16,7 @@ use Botble\Base\Forms\Fields\MediaImagesField;
 use Botble\Base\Forms\Fields\OnOffField;
 use Botble\Base\Forms\Fields\RepeaterField;
 use Botble\Base\Forms\Fields\TimeField;
+use Botble\Hotel\Forms\Fields\DownpaymentField;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -270,6 +271,7 @@ abstract class FormAbstract extends Form
     public function withCustomFields(): self
     {
         $customFields = [
+            'downpayment'  => DownpaymentField::class,
             'customSelect' => CustomSelectField::class,
             'editor'       => EditorField::class,
             'onOff'        => OnOffField::class,

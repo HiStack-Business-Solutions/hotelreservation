@@ -223,7 +223,7 @@ class RoomController extends BaseController
                 $row->title = $row->event = format_price($price);
                 $row->price = $price;
 
-                if (!$row->active) {
+                if (!$row->active || $row->number_of_rooms <= 0) {
                     $row->title = $row->event = trans('plugins/hotel::room.not_available');
                     $row->backgroundColor = '#fe2727';
                     $row->classNames = ['blocked-event'];

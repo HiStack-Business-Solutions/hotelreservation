@@ -42,7 +42,13 @@
 
             @foreach ($fields as $field)
                 @if (!in_array($field->getName(), $exclude))
-                    <div class="widget meta-boxes">
+                    <div
+                        @if(is_array($field->getOption('widget_attr'))) 
+                        @foreach($field->getOption('widget_attr') as $widget_attr => $widget_attr_val)
+                            {{ $widget_attr }}="{{$widget_attr_val}}"
+                        @endforeach
+                        @endif
+                        class="widget meta-boxes">
                         <div class="widget-title">
                             <h4>{!! Form::customLabel($field->getName(), $field->getOption('label'), $field->getOption('label_attr')) !!}</h4>
                         </div>

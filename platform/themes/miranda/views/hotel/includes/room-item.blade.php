@@ -52,7 +52,7 @@
         <h4 class="title"><a href="{{ $room->url }}">{{ $room->name }}</a></h4>
         <break class="mb-10"><a>Room Available : </a>
             <a href="{{ $room->url }}">
-                {{ $roomBookings[$room->id]['maxRooms'] }}
+                {{ $roomBookings[$room->id]['isAvailable'] ? $roomBookings[$room->id]['maxRooms'] : 0 }}
             </a>
         </break>
         <br class="mb-10"><a>Capacity : </a>

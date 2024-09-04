@@ -67,7 +67,7 @@
                         <div class="row room-gird-loop">
                             @foreach($relatedRooms as $relatedRoom)
                                 <div class="col-lg-6 col-sm-6">
-                                    @include(Theme::getThemeNamespace() . '::views.hotel.includes.room-item', ['room' => $relatedRoom])
+                                    @include(Theme::getThemeNamespace() . '::views.hotel.includes.room-item', ['room' => $relatedRoom, 'roomBookings' => $roomBookings])
                                 </div>
                             @endforeach
                         </div>

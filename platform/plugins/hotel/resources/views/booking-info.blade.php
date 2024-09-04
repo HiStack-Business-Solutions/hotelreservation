@@ -83,6 +83,10 @@
         <br>
         <p><strong>{{ __('Discount') }}</strong>: <span class="text-danger">{{ $booking->discount}}% <i>(exclude Service)</i></span></p>
         <p><strong>{{ __('Total Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->amount) }}</span></p>
+        @if($booking->payment->dp_amount > 0)
+        <p><strong>{{ __('Paid DP Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->payment->dp_amount) }}</span></p>
+        <p><strong>{{ __('Remaining Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->amount - $booking->payment->dp_amount) }}</span></p>
+        @endif
         <p><strong>{{ __('Payment method') }}</strong>: {{ $booking->payment->id ? $booking->payment->payment_channel->label() : 'N/A' }}</p>
     </div>
     <p><strong>{{ __('Payment status') }}</strong>: <a @if(Auth::check()) href="{{route('payment.show', $booking->payment->id)}}"@endif>{!! $booking->payment->id ? $booking->payment->status->toHtml() : \Botble\Payment\Enums\PaymentStatusEnum::PENDING()->toHtml() !!}</a></p>

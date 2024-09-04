@@ -21,6 +21,10 @@ class BookingForm extends FormAbstract
         $payment = $booking->payment;
         $fileExists = Storage::exists('public/payment_proofs/' . $payment->payment_proof);
         $showUploadForm = false;
+        $dp_widget_style = ['id' => 'downpayment-widget'];
+        if ($booking->status != BookingStatusEnum::PROCESSING()) {
+            $dp_widget_style['hidden'] = '';
+        }
         $this
             ->setupModel(new Booking)
             ->setValidatorClass(BookingRequest::class)
@@ -34,6 +38,11 @@ class BookingForm extends FormAbstract
                 'choices'    => BookingStatusEnum::labels(),
             ])
             ->setBreakFieldPoint('status')
+            ->add('Down Payment Amount', 'downpayment', [
+                'booking' => $booking,
+                'label_attr' => ['class' => 'control-label required'],
+                'widget_attr' => $dp_widget_style
+            ])
             ->addMetaBoxes([
                 'information' => [
                     'title'      => trans('plugins/hotel::booking.booking_information'),

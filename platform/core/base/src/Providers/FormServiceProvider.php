@@ -140,6 +140,13 @@ class FormServiceProvider extends ServiceProvider
             'attributes' => [],
         ]);
 
+        Form::component('downpayment', 'plugins/hotel::downpayment-admin', [
+            'name',
+            'value'      => null,
+            'attributes' => [],
+            'booking' => []
+        ]);
+
         Form::component('repeater', 'core/base::forms.partials.repeater', [
             'name',
             'value'  => null,

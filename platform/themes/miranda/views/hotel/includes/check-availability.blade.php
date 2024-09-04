@@ -32,8 +32,9 @@
             <div class="input-group input-group-two left-icon mb-20">
                 <label for="category">{{ __('Room Category') }}</label>
                 <select name="category" id="category">
+                    <option value="0" @if (request()->query('category', 0) == 0) selected @endif>Any</option>
                     @foreach($categories as $cat)
-                        <option value="{{ $cat->id }}" @if (request()->query('category', $categories[0]->id) == $cat->id) selected @endif>{{ $cat->name }} </option>
+                        <option value="{{ $cat->id }}" @if (request()->query('category', 0) == $cat->id) selected @endif>{{ $cat->name }} </option>
                     @endforeach
                 </select>
             </div>

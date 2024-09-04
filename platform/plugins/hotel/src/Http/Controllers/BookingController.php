@@ -23,6 +23,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use NumberFormatter;
 use Throwable;
 
 class BookingController extends BaseController
@@ -68,7 +69,42 @@ class BookingController extends BaseController
 
         return $formBuilder->create(BookingForm::class, ['model' => $booking])->renderForm();
     }
+    function localStringToNumber($s, $thousandRegex, $decimalRegex) {
+        
+    }
+    
+    function parseLocaleNumber($stringNumber, $thousandRegex, $decimalRegex) {
+        
+    }
+    private function getIDRAmount(string $value) {
+        $formatter = new NumberFormatter('en', NumberFormatter::CURRENCY);
 
+        // Format the number to get the thousand separator
+        $thousandFormatted = $formatter->formatCurrency(11111, 'IDR');
+        preg_match('/(.)\d{3}/', $thousandFormatted, $thousandMatches);
+        $thousandSeparator = $thousandMatches[1];
+
+        // Format the number to get the decimal separator
+        $decimalFormatted = $formatter->formatCurrency(1.1, 'IDR');
+        preg_match('/\d+(.)\d+$/', $decimalFormatted, $decimalMatches);
+        $decimalSeparator = $decimalMatches[1];
+
+        // Create regular expressions for thousand and decimal separators
+        $thousandRegex = '/' . preg_quote($thousandSeparator, '/') . '/';
+        $decimalRegex = '/' . preg_quote($decimalSeparator, '/') . '/';
+        
+        // Remove all characters except digits, dot, comma, and minus sign
+        $numForm = preg_replace('/[^0-9.,-]+/', '', (string)$value);
+        // Remove thousand separators and replace decimal separator with a dot
+        $val = floatval(
+            preg_replace($decimalRegex, '.', 
+                preg_replace($thousandRegex, '', $numForm)
+            )
+        );
+    
+        // If the resulting value is not a number, return 0
+        return is_nan($val) ? 0 : $val;
+    }
     /**
      * @param $id
      * @param BookingRequest $request
@@ -91,6 +127,17 @@ class BookingController extends BaseController
                 ->setError(true)
                 ->setMessage('Perlu Bukti Transfer DP');
         }
+        $dp_amount = $this->getIDRAmount($request->input('dp_amount'));
+        if ($dp_amount > $booking->payment->amount) {
+            return $response
+                ->setError(true)
+                ->setMessage('Down payment amount melebihi batas nilai total payment');
+        }
+        if ($dp_amount <= 0 && $booking->status == BookingStatusEnum::PROCESSING() && $booking->payment->payment_channel == 'down_payment') {
+            return $response
+                ->setError(true)
+                ->setMessage('Down payment tidak boleh kurang dari nol');
+        }
         if (in_array($booking->status, [
             BookingStatusEnum::LUNAS(), 
             BookingStatusEnum::COMPLETED(),
@@ -101,8 +148,12 @@ class BookingController extends BaseController
                 ->setMessage('Payment Status belum COMPLETED');
         }
         $this->bookingRepository->createOrUpdate($booking);
+        if ($dp_amount > 0 && $booking->status == BookingStatusEnum::PROCESSING() && $booking->payment->payment_channel == 'down_payment') {
+            $booking->payment->dp_amount = $dp_amount;
+            $booking->payment->save();
+        }
         $paymentProofPath = 'public/payment_proofs/' . $booking->payment->payment_proof;
-        if ($booking->status == BookingStatusEnum::PROCESSING() && $booking->payment->payment_channel == 'down_payment') {
+        if ($booking->status == BookingStatusEnum::PROCESSING() && $booking->payment->payment_channel == 'down_payment' && Storage::exists($paymentProofPath)) {
             Storage::move($paymentProofPath, $paymentProofPath . '-downpayment');
         }
 
