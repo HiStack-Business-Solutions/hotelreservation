@@ -91,7 +91,11 @@ class BookingController extends BaseController
                 ->setError(true)
                 ->setMessage('Perlu Bukti Transfer DP');
         }
-        if ($booking->status == BookingStatusEnum::LUNAS() && $booking->payment->status != PaymentStatusEnum::COMPLETED()) {
+        if (in_array($booking->status, [
+            BookingStatusEnum::LUNAS(), 
+            BookingStatusEnum::COMPLETED(),
+            BookingStatusEnum::CHECKIN()]) 
+            && $booking->payment->status != PaymentStatusEnum::COMPLETED()) {
             return $response
                 ->setError(true)
                 ->setMessage('Payment Status belum COMPLETED');
