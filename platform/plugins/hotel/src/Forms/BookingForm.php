@@ -4,6 +4,7 @@ namespace Botble\Hotel\Forms;
 
 use Botble\Base\Forms\FormAbstract;
 use Botble\Hotel\Enums\BookingStatusEnum;
+use Botble\Hotel\Forms\Fields\DownpaymentField;
 use Botble\Hotel\Http\Requests\BookingRequest;
 use Botble\Hotel\Models\Booking;
 use Illuminate\Support\Facades\Auth;
@@ -27,7 +28,11 @@ class BookingForm extends FormAbstract
         }
         $this
             ->setupModel(new Booking)
-            ->setValidatorClass(BookingRequest::class)
+            ->setValidatorClass(BookingRequest::class);
+        if (!$this->formHelper->hasCustomField('downpayment')) {
+            $this->addCustomField('downpayment', DownpaymentField::class);
+        }
+        $this
             ->withCustomFields()
             ->add('status', 'customSelect', [
                 'label'      => trans('core/base::tables.status'),

@@ -271,7 +271,6 @@ abstract class FormAbstract extends Form
     public function withCustomFields(): self
     {
         $customFields = [
-            'downpayment'  => DownpaymentField::class,
             'customSelect' => CustomSelectField::class,
             'editor'       => EditorField::class,
             'onOff'        => OnOffField::class,
