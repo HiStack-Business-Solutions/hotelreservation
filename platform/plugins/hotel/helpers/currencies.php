@@ -53,11 +53,11 @@ if (!function_exists('human_price_text')) {
             if ($price >= 1000000 && $price < 1000000000) {
                 $price = round($price / 1000000, 2);
                 $numberAfterDot = 2;
-                $priceUnit = __('million') . ' ' . $priceUnit;
+                $priceUnit = __('juta') . ' ' . $priceUnit;
             } elseif ($price >= 1000000000) {
                 $price = round($price / 1000000000, 2);
                 $numberAfterDot = 2;
-                $priceUnit = __('billion') . ' ' . $priceUnit;
+                $priceUnit = __('miliar') . ' ' . $priceUnit;
             }
         }
 
