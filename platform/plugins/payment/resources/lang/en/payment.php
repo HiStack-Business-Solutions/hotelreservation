@@ -71,6 +71,7 @@ return [
     'statuses'                              => [
         'pending'   => 'Pending',
         'completed' => 'Completed',
+        'lunas'     => 'Lunas',
         'refunding' => 'Refunding',
         'refunded'  => 'Refunded',
         'fraud'     => 'Fraud',

@@ -5,6 +5,7 @@ namespace Botble\Payment\Http\Controllers;
 use Assets;
 use Botble\Base\Events\DeletedContentEvent;
 use Botble\Base\Http\Responses\BaseHttpResponse;
+use Botble\Hotel\Models\PaymentStatus;
 use Botble\Payment\Enums\PaymentMethodEnum;
 use Botble\Payment\Enums\PaymentStatusEnum;
 use Botble\Payment\Http\Requests\CheckoutRequest;
@@ -257,7 +258,8 @@ class PaymentController extends Controller
                 break;
         }
 
-        $paymentStatuses = PaymentStatusEnum::labels();
+        // $paymentStatuses = PaymentStatusEnum::labels();
+        $paymentStatuses = PaymentStatus::allStatusEnums();
 
         if ($payment->status != PaymentStatusEnum::PENDING) {
             Arr::forget($paymentStatuses, PaymentStatusEnum::PENDING);
@@ -364,7 +366,7 @@ class PaymentController extends Controller
         $payment = $this->paymentRepository->findOrFail($id);
 
         $payment->status = $request->input('status');
-        if ($payment->status == PaymentStatusEnum::COMPLETED() && !$payment->payment_proof) {
+        if ($payment->isLunas() && !$payment->payment_proof) {
             return $response
                 ->setError(true)
                 ->setMessage('Perlu Bukti Transfer');

@@ -5,6 +5,7 @@ namespace Botble\Payment\Tables;
 use Illuminate\Support\Facades\Auth;
 use Botble\Blog\Exports\PostExport;
 use BaseHelper;
+use Botble\Hotel\Models\PaymentStatus;
 use Botble\Payment\Enums\PaymentStatusEnum;
 use Botble\Payment\Repositories\Interfaces\PaymentInterface;
 use Botble\Table\Abstracts\TableAbstract;
@@ -157,7 +158,7 @@ class PaymentTable extends TableAbstract
             'payments.status'     => [
                 'title'    => trans('core/base::tables.status'),
                 'type'     => 'select',
-                'choices'  => PaymentStatusEnum::labels(),
+                'choices'  => PaymentStatus::allStatusEnums(),
                 'validate' => 'required|in:' . implode(',', PaymentStatusEnum::values()),
             ],
             'payments.charge_id'  => [

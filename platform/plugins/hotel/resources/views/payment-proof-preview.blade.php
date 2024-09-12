@@ -11,7 +11,7 @@
     @if($payment->payment_proof_base64)
     <div style="col">
         <label class="col" for="payment_proof_image" style="background-color: rgba(255, 255, 255, 0.7); padding: 5px; border-radius: 3px; font-weight: bold;">
-            {{ !$payment->payment_proof_dp_base64 && $payment->payment_channel == 'down_payment' && $payment->status != \Botble\Payment\Enums\PaymentStatusEnum::COMPLETED() ? 'Temporary Payment' : 'Full Payment'}}
+            {{ !$payment->payment_proof_dp_base64 && $payment->payment_channel == 'down_payment' && $payment->isLunas() ? 'Temporary Payment' : 'Full Payment'}}
         </label>
         <img class="col" name="payment_proof_image" id="payment_proof_image" src="{{ $payment->payment_proof_base64 }}" 
             alt="Payment Proof" style="max-width: 600px; height: auto;">

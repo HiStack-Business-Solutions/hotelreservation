@@ -74,4 +74,12 @@ class Payment extends BaseModel
         return 'You have created a payment #' . $this->charge_id . ' via ' . $this->payment_channel->label() . ' ' . $time .
             ': ' . number_format($this->amount, 2, '.', ',') . $this->currency;
     }
+    
+    /**
+     * @return bool
+     */
+    public function isLunas(): bool 
+    {
+        return $this->status == PaymentStatusEnum::COMPLETED() || $this->status == PaymentStatusEnum::LUNAS();
+    }
 }

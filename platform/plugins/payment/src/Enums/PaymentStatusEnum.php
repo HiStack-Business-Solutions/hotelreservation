@@ -8,6 +8,7 @@ use Html;
 /**
  * @method static PaymentStatusEnum PENDING()
  * @method static PaymentStatusEnum COMPLETED()
+ * @method static PaymentStatusEnum LUNAS()
  * @method static PaymentStatusEnum REFUNDING()
  * @method static PaymentStatusEnum REFUNDED()
  * @method static PaymentStatusEnum FRAUD()
@@ -17,6 +18,7 @@ class PaymentStatusEnum extends Enum
 {
     public const PENDING = 'pending';
     public const COMPLETED = 'completed';
+    public const LUNAS = 'lunas';
     public const REFUNDING = 'refunding';
     public const REFUNDED = 'refunded';
     public const FRAUD = 'fraud';
@@ -38,6 +40,9 @@ class PaymentStatusEnum extends Enum
                     ->toHtml();
             case self::COMPLETED:
                 return Html::tag('span', self::COMPLETED()->label(), ['class' => 'label-success status-label'])
+                    ->toHtml();
+            case self::LUNAS():
+                return Html::tag('span', self::LUNAS()->label(), ['class' => 'label-success status-label'])
                     ->toHtml();
             case self::REFUNDING:
                 return Html::tag('span', self::REFUNDING()->label(), ['class' => 'label-warning status-label'])

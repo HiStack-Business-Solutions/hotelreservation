@@ -142,7 +142,7 @@ class BookingController extends BaseController
             BookingStatusEnum::LUNAS(), 
             BookingStatusEnum::COMPLETED(),
             BookingStatusEnum::CHECKIN()]) 
-            && $booking->payment->status != PaymentStatusEnum::COMPLETED()) {
+            && $booking->payment->isLunas()) {
             return $response
                 ->setError(true)
                 ->setMessage('Payment Status belum COMPLETED');
