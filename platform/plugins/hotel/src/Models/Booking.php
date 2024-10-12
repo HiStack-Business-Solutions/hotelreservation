@@ -26,6 +26,7 @@ class Booking extends BaseModel
      * @var array
      */
     protected $fillable = [
+        'nik',
         'status',
         'amount',
         'currency_id',

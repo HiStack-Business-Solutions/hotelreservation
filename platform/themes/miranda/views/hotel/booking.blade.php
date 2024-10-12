@@ -107,7 +107,7 @@
                                     <div class="col-md-12">
                                         <div class="form-group input-group input-group-two mb-20">
                                             <label for="txt-first-name">NIK <span class="required">*</span></label>
-                                            <input type="text" name="nik" id="txt-nik" required value="{{ old('nik') }}">
+                                            <input type="text" maxlength="16" name="nik" id="txt-nik" required value="{{ old('nik') }}">
                                         </div>
                                     </div>
                                 </div>
