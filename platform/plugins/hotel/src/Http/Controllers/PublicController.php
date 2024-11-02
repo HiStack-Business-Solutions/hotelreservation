@@ -583,7 +583,7 @@ class PublicController extends Controller
         BookingService $bookingService
     ) {
         $booking = $bookingRepository->getModel();
-        $booking->fill($request->input());
+        $booking->fill($request->except('nik'));
         
         [
             'discount' => $discount,

@@ -24,6 +24,11 @@ class PaymentStatus extends BaseModel
         'status_id' => PaymentStatusEnum::class,
     ];
     public static function allStatusEnums():array {
-        return PaymentStatus::all()->map(function($x) { return $x->status_id; })->toArray();
+        $statuses = PaymentStatus::all();
+        $allStatus = array();
+        foreach($statuses as $status) {
+            $allStatus[strval($status->status_id)] = $status->name;
+        }
+        return $allStatus;
     }
 }
