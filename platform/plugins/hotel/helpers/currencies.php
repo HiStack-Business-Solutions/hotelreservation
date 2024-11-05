@@ -14,7 +14,7 @@ if (!function_exists('format_price')) {
      * @param bool $useSymbol
      * @return string
      */
-    function format_price($price, $currency = null, $withoutCurrency = false, $useSymbol = true): string
+    function format_price($price, $currency = null, $withoutCurrency = false, $useSymbol = true, $useNumericFormat = true): string
     {
         if (!$currency) {
             $currency = get_application_currency();
@@ -34,7 +34,7 @@ if (!function_exists('format_price')) {
             return human_price_text($price, $currency);
         }
 
-        return human_price_text($price, $currency, ($useSymbol ? $currency->symbol : $currency->title));
+        return human_price_text($price, $currency, ($useSymbol ? $currency->symbol : $currency->title), $useNumericFormat);
     }
 }
 
@@ -45,7 +45,7 @@ if (!function_exists('human_price_text')) {
      * @param string $priceUnit
      * @return string
      */
-    function human_price_text($price, $currency, $priceUnit = ''): string
+    function human_price_text($price, $currency, $priceUnit = '', $useNumericFormat = true): string
     {
         $numberAfterDot = ($currency instanceof Currency) ? $currency->decimals : 0;
 
@@ -53,11 +53,11 @@ if (!function_exists('human_price_text')) {
             if ($price >= 1000000 && $price < 1000000000) {
                 $price = round($price / 1000000, 2);
                 $numberAfterDot = 2;
-                $priceUnit = __('juta') . ' ' . $priceUnit;
+                $priceUnit = $useNumericFormat ? $priceUnit : __('juta') . ' ' . $priceUnit;
             } elseif ($price >= 1000000000) {
                 $price = round($price / 1000000000, 2);
                 $numberAfterDot = 2;
-                $priceUnit = __('miliar') . ' ' . $priceUnit;
+                $priceUnit = $useNumericFormat ? $priceUnit : __('miliar') . ' ' . $priceUnit;
             }
         }
 
