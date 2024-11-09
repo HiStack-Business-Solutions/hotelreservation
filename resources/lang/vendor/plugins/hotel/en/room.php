@@ -12,6 +12,7 @@ return [
         'currency'          => 'Currency',
         'max_children'      => 'Max children',
         'max_adults'        => 'Max adults',
+        'max_extrabed'      => 'Max Extra Bed',
         'category'          => 'Category',
         'size'              => 'Size (m2)',
         'number_of_rooms'   => 'Number of rooms (quantity)',

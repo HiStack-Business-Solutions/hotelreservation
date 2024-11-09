@@ -208,16 +208,22 @@
                       <p><strong>{{ __('Discount') }}</strong>: <span class="text-danger">{{ $booking->discount}}% <i>(exclude Service)</i></span></p>
                       <p><strong>{{ __('Total Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->amount) }}</span></p>
                       <p><strong>{{ __('Payment method') }}</strong>: {{ $booking->payment->id ? $booking->payment->payment_channel->label() : 'N/A' }}</p>
+                      @if(str_contains($booking->payment->payment_channel->label(), 'Down Payment'))
+                      @php
+                        $timeIn60Minutes = \Carbon\Carbon::now()->addMinutes(60)->format('Y-m-d H:i:s');
+                      @endphp
+                        <p>
+                            <strong>{{ __('Total Down Payment') }}</strong>: {{ format_price($booking->amount * 0.5) }} - 
+                            <i><strong> Please paid before {{ $timeIn60Minutes }} </strong></i>
+                        </p>
+                      @endif
                   </div>
-                  
                   <p><strong>{{ __('Payment status') }}</strong>: {!! $booking->payment->id ? $booking->payment->status->toHtml() : \Botble\Payment\Enums\PaymentStatusEnum::PENDING()->toHtml() !!}</p>
-
+                  
+                  <p style="font-family: Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">{!! clean(theme_option('payment_description')) !!}.</p>
                   <p style="font-family: Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">If you have any questions or need to make changes to your reservation, please do not hesitate to contact us at [Contact Information].</p>
-
                   <p style="font-family: Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">We look forward to welcoming you to Natura Ecopark and hope you have a pleasant stay.</p>
-
                   <p style="font-family: Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">Thank you for choosing us!</p>
-
                   <p style="font-family: Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">Warm regards,</p>
                   <p style="font-family: Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">Natura Ecopark Team</p>
                 </td>
@@ -237,7 +243,7 @@
                 </tr>
                 <tr>
                   <td class="content-block powered-by" style="font-family: Helvetica, sans-serif; vertical-align: top; color: #9a9ea6; font-size: 16px; text-align: center;" valign="top" align="center">
-                    Powered by <a href="https://rumahkhitanputrabcl.com/companyprofile/home" style="color: #9a9ea6; font-size: 16px; text-align: center; text-decoration: none;">HiStack Business Solution</a>
+                    Powered by <a href="https://rumahkhitanputrabcl.com/companyprofile/home" style="color: #9a9ea6; font-size: 16px; text-align: center; text-decoration: none;">HiStack Solutions</a>
                   </td>
                 </tr>
               </table>

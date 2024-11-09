@@ -49,17 +49,17 @@ if (!function_exists('human_price_text')) {
     {
         $numberAfterDot = ($currency instanceof Currency) ? $currency->decimals : 0;
 
-        if (config('plugins.hotel.hotel.display_big_money_in_million_billion')) {
-            if ($price >= 1000000 && $price < 1000000000) {
-                $price = round($price / 1000000, 2);
-                $numberAfterDot = 2;
-                $priceUnit = __('juta') . ' ' . $priceUnit;
-            } elseif ($price >= 1000000000) {
-                $price = round($price / 1000000000, 2);
-                $numberAfterDot = 2;
-                $priceUnit = __('miliar') . ' ' . $priceUnit;
-            }
-        }
+        // if (config('plugins.hotel.hotel.display_big_money_in_million_billion')) {
+        //     if ($price >= 1000000 && $price < 1000000000) {
+        //         $price = round($price / 1000000, 2);
+        //         $numberAfterDot = 2;
+        //         $priceUnit = __('juta') . ' ' . $priceUnit;
+        //     } elseif ($price >= 1000000000) {
+        //         $price = round($price / 1000000000, 2);
+        //         $numberAfterDot = 2;
+        //         $priceUnit = __('miliar') . ' ' . $priceUnit;
+        //     }
+        // }
 
         if (is_numeric($price)) {
             $price = preg_replace('/[^0-9,.]/s', '', $price);

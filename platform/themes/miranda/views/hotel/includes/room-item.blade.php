@@ -60,6 +60,11 @@
                 {{ $room->max_adults }} + {{ $room->max_children }} anak kecil
             </a>
         </br>
+        <break class="mb-10"><a>Plus Extra Bed : </a>
+            <a href="{{ $room->url }}">
+                {{ $room->max_extrabed }} Maximum
+            </a>
+        </break>
         <p class="mb-10"><a>Discount : </a>
             <a href="{{ $room->url }}">
                 @if ($filteredDates->isEmpty())

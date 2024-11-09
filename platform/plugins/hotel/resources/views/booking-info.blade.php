@@ -87,6 +87,13 @@
         <p><strong>{{ __('Paid DP Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->payment->dp_amount) }}</span></p>
         <p><strong>{{ __('Remaining Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->amount - $booking->payment->dp_amount) }}</span></p>
         @endif
+
+        @if(str_contains($booking->payment->payment_channel->label(), 'Down Payment'))
+                          <p>
+                              <strong>{{ __('Total Down Payment') }}</strong>: <span class="text-danger"> {{ format_price($booking->amount * 0.5) }} </span>
+                          </p>
+        @endif
+
         <p><strong>{{ __('Payment method') }}</strong>: {{ $booking->payment->id ? $booking->payment->payment_channel->label() : 'N/A' }}</p>
     </div>
     <p><strong>{{ __('Payment status') }}</strong>: <a @if(Auth::check()) href="{{route('payment.show', $booking->payment->id)}}"@endif>{!! $booking->payment->id ? $booking->payment->status->toHtml() : \Botble\Payment\Enums\PaymentStatusEnum::PENDING()->toHtml() !!}</a></p>

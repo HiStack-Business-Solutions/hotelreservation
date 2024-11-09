@@ -175,7 +175,7 @@ class RoomForm extends FormAbstract
                 'label'         => trans('plugins/hotel::room.form.max_adults'),
                 'label_attr'    => ['class' => 'control-label'],
                 'wrapper'       => [
-                    'class' => 'form-group col-md-4',
+                    'class' => 'form-group col-md-3',
                 ],
                 'attr'          => [
                     'id'          => 'max-adults-number',
@@ -188,7 +188,7 @@ class RoomForm extends FormAbstract
                 'label'         => trans('plugins/hotel::room.form.max_children'),
                 'label_attr'    => ['class' => 'control-label'],
                 'wrapper'       => [
-                    'class' => 'form-group col-md-4',
+                    'class' => 'form-group col-md-3',
                 ],
                 'attr'          => [
                     'id'          => 'max-children-number',
@@ -197,11 +197,24 @@ class RoomForm extends FormAbstract
                 ],
                 'default_value' => 0,
             ])
+            ->add('max_extrabed', 'text', [
+                'label'         => trans('plugins/hotel::room.form.max_extrabed'),
+                'label_attr'    => ['class' => 'control-label'],
+                'wrapper'       => [
+                    'class' => 'form-group col-md-3',
+                ],
+                'attr'          => [
+                    'id'          => 'max-children-number',
+                    'placeholder' => trans('plugins/hotel::room.form.max_extrabed'),
+                    'class'       => 'form-control input-mask-number',
+                ],
+                'default_value' => 0,
+            ])
             ->add('size', 'text', [
                 'label'         => trans('plugins/hotel::room.form.size'),
                 'label_attr'    => ['class' => 'control-label'],
                 'wrapper'       => [
-                    'class' => 'form-group col-md-4',
+                    'class' => 'form-group col-md-3',
                 ],
                 'attr'          => [
                     'id'          => 'size-number',
