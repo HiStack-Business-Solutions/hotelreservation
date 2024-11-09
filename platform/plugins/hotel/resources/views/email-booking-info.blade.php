@@ -128,12 +128,25 @@
                               <p>{{ __('Email') }}: <i><a href="mailto:{{ $booking->address->email }}">{{ $booking->address->email }}</a></i></p>
                               <p>{{ __('Phone') }}: <i>@if ($booking->address->phone) <a href="tel:{{ $booking->address->phone }}">{{ $booking->address->phone }}</a> @else N/A @endif</i></p>
                           </div>
+                          @php
+                              $startDate = \Carbon\Carbon::parse($booking->room->start_date);
+                              $endDate = \Carbon\Carbon::parse($booking->room->end_date);
+                              $totalDays = $startDate->diffInDays($endDate);
+
+                              // Tentukan format malam/hari berdasarkan totalDays
+                              if ($totalDays === 1) {
+                                  $daysAndNights = "1 malam";
+                              } else {
+                                  $daysAndNights = "{$totalDays} hari " . ($totalDays - 1) . " malam";
+                              }
+                          @endphp
                           <div class="col-md-6">
                               <p>{{ __('Address') }}: <i>{{ $booking->address->id ? $booking->address->address . ', ' . $booking->address->city . ', ' . $booking->address->state . ', ' . $booking->address->country . ', ' . $booking->address->zip : 'N/A' }}</i></p>
                               @if(count($booking->rooms) == 1)<p>{{ __('Room') }}: <i>@if ($booking->room->room->id) <a href="{{ $booking->room->room->url }}" target="_blank">{{ $booking->room->room->name }}</a> @else N/A @endif</i></p>@endif
                               <p><strong>{{ __('Start Date') }}</strong>: <i>{{ $booking->room->start_date }}</i></p>
                               <p><strong>{{ __('End Date') }}</strong>: <i>{{ $booking->room->end_date }}</i></p>
                               <p><strong>{{ __('Arrival Time') }}</strong>: <i>{{ $booking->arrival_time }}</i></p>
+                              <p><strong>{{ __('Total Days') }}</strong>: <i>{{ $daysAndNights }}</i></p>
                           </div>
                       </div>
                       <br>
@@ -206,7 +219,7 @@
                   <p style="font-family: Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">Thank you for choosing us!</p>
 
                   <p style="font-family: Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">Warm regards,</p>
-                  <p style="font-family: Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">Panorama Ecopark Team</p>
+                  <p style="font-family: Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">Natura Ecopark Team</p>
                 </td>
               </tr>
 

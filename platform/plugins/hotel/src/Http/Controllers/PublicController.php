@@ -395,6 +395,10 @@ class PublicController extends Controller
             ['currency', 'category']
         );
         ['numberOfRooms'=> $numberOfRooms, 'rooms' => $rooms] = $this->getMultiBooking($sessionData, $roomRepository);
+        if (!$multiBook) {
+            $numberOfRooms = new Collection();
+            $rooms = new Collection();
+        }
         if (!$room && !$rooms) {
             abort(404);
         }

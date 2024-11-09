@@ -68,7 +68,7 @@
                     <img src="{{ RvMedia::getImageUrl(theme_option('logo')) }}" alt="{{ theme_option('site_title') }}">
                 </a>
             -->
-            ECOPARK
+            NATURA ECOPARK
             </div>
 
             <!-- Header Info Pushed To Menu Wrap -->
@@ -82,6 +82,9 @@
                             <a href="tel:{{ theme_option('hotline') }}">
                                 <h5 class="title">{{ theme_option('hotline') }}</h5>
                             </a>
+                            <!--<a href="https://wa.me/{{ theme_option('hotline')}}">-->
+                            <!--    <h5 class="title">{{ theme_option('hotline') }}</h5>-->
+                            <!--</a>-->
                         </div>
                     @endif
                     @if (theme_option('email'))
