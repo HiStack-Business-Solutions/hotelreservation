@@ -4,7 +4,7 @@ Theme::layout('homepage')
 
 {!! do_shortcode('[home-banner][/home-banner]') !!}
 {!! do_shortcode('[check-availability-form][/check-availability-form]') !!}
-{!! do_shortcode('[hotel-about title="since 1994" description="Situated In Prime Position At The Foot Of The Slopes Of Courchevel Moriond." block_icon_1="flaticon-coffee" block_text_1="Breakfast" block_icon_2="flaticon-air-freight" block_text_2="Airport Pickup" block_icon_3="flaticon-marker" block_text_3="City Guide" block_icon_4="flaticon-barbecue" block_text_4="BBQ Party" block_icon_5="flaticon-hotel" block_text_5="Luxury Room"][/hotel-about]') !!}
+{!! do_shortcode('[hotel-about title="since 2021" description="Situated In Prime Position At The Foot Of The Slopes Of Courchevel Moriond." block_icon_1="flaticon-coffee" block_text_1="Breakfast" block_icon_2="flaticon-air-freight" block_text_2="Airport Pickup" block_icon_3="flaticon-marker" block_text_3="City Guide" block_icon_4="flaticon-barbecue" block_text_4="BBQ Party" block_icon_5="flaticon-hotel" block_text_5="Luxury Room"][/hotel-about]') !!}
 {!! do_shortcode('[room-categories title="Room Type" sub_title="Inspired Loding" background_image="general/bg.jpg"][/room-categories]') !!}
 {!! do_shortcode('[hotel-featured-features title="The Thin Escape" description="Miranda has everything for your trip & every single things." button_text="Take a tour" button_url="#"][/hotel-featured-features]') !!}
 {!! do_shortcode('[rooms][/rooms]') !!}

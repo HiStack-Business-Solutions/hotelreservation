@@ -73,6 +73,27 @@
                             <div class="row">
                                 @if (count($chunks) > 0)
                                     <div class="col-md-6">
+                                        <!-- @foreach($chunks[0] as $service)
+                                            @if(str_contains($service->name, 'Extrabed'))
+                                                @for($i = 1; $i <= $room->max_extrabed; $i++)
+                                                    <div class="form-group mb-20 custom-checkbox">
+                                                    <label for="service_{{ $service->id }}">
+                                                    <input type="checkbox" class="service-item" id="service_{{ $service->id }}" name="services[]" value="{{ $service->id }}" data-price="{{ $service->price }}">
+                                                            Extra Bed Option {{ $i }} <em>({{ format_price($service->price) }})</em>
+                                                            <span></span>
+                                                        </label>
+                                                    </div>
+                                                @endfor
+                                            @else
+                                                <div class="form-group mb-20 custom-checkbox">
+                                                    <label for="service_{{ $service->id }}">
+                                                        <input type="checkbox" class="service-item" id="service_{{ $service->id }}" name="services[]" value="{{ $service->id }}" data-price="{{ $service->price }}">
+                                                        {{ $service->name }} <em>({{ format_price($service->price) }})</em>
+                                                        <span></span>
+                                                    </label>
+                                                </div>
+                                            @endif
+                                        @endforeach -->
                                         @foreach($chunks[0] as $service)
                                             <div class="form-group mb-20 custom-checkbox">
                                                 <label for="service_{{ $service->id }}">
@@ -272,7 +293,7 @@
                                                    value="down_payment" data-toggle="collapse" data-target=".payment_bank_transfer_wrap" data-parent=".list_payment_method">
                                             <label for="payment_bank_transfer" class="text-left">{{ setting('payment_bank_transfer_name', trans('plugins/payment::payment.payment_via_bank_transfer')) }}</label>
                                             <div class="payment_bank_transfer_wrap payment_collapse_wrap collapse @if (setting('default_payment_method') == \Botble\Payment\Enums\PaymentMethodEnum::BANK_TRANSFER) show @endif" style="padding: 15px 0;">
-                                                {!! clean(setting('payment_bank_transfer_description')) !!}
+                                                {!! clean(setting('payment_bank_transfer_description')) !!}, and please payment {{ format_price($total * 0.5) }} (50% from total)
                                             </div>
                                         </li>
                                     @endif

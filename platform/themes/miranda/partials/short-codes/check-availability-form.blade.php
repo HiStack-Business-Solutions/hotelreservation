@@ -32,6 +32,12 @@
                                     </select>
                                 </div>
                             </div>
+
+                            <!-- untuk set category all (0), karena defaultnya 1 maka category lain not available -->
+                            <div class="col-lg-3 col-md-6 hidden" hidden>
+                                <input type="text" value="0" name="category" id="category">
+                            </div>
+
                             <div class="col-lg-3 col-md-6">
                                 <div class="inputs-filed mt-30">
                                     <button type="submit">{{ __('Check Availability') }}</button>

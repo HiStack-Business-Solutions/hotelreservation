@@ -55,6 +55,20 @@ theme_option()
         ],
     ])
     ->setField([
+        'id'         => 'payment_description',
+        'section_id' => 'opt-text-subsection-general',
+        'type'       => 'editor',
+        'label'      => __('Payment Description'),
+        'attributes' => [
+            'name'    => 'payment_description',
+            'value'   => null,
+            'options' => [
+                'class' => 'form-control',
+                'rows'  => 2,
+            ],
+        ],
+    ])
+    ->setField([
         'id'         => 'cancellation',
         'section_id' => 'opt-text-subsection-general',
         'type'       => 'editor',

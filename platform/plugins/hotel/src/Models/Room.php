@@ -39,6 +39,7 @@ class Room extends BaseModel
         'size',
         'max_adults',
         'max_children',
+        'max_extrabed',
         'room_category_id',
         'tax_id',
         'status',
