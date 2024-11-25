@@ -94,7 +94,10 @@
         <p><strong>{{ __('Payment method') }}</strong>: {{ $booking->payment->id ? $booking->payment->payment_channel->label() : 'N/A' }}</p>
     </div>
     <p><strong>{{ __('Payment status') }}</strong>: <a @if(Auth::check()) href="{{route('payment.show', $booking->payment->id)}}"@endif>{!! $booking->payment->id ? $booking->payment->status->toHtml() : \Botble\Payment\Enums\PaymentStatusEnum::PENDING()->toHtml() !!}</a></p>
-
+    
+    <div>
+        @include('plugins/hotel::countdown-timer', compact('booking'))
+    </div>
     <div style="display: flex; justify-content: flex-end;">
         <button onclick="printDiv('printableArea')" style="background-color: #007bff; color: white; border: none; padding: 8px 20px; border-radius: 5px; display: flex; align-items: center; margin-right: 10px;">
             <i class="fa fa-print" aria-hidden="true" style="margin-right: 5px;"></i> Print
