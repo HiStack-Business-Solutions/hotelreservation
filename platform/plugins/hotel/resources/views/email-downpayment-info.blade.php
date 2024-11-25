@@ -141,6 +141,7 @@
                       @endif
                       <br>
                       <p><strong>{{ __('Discount') }}</strong>: <span class="text-danger">{{ $booking->discount}}% <i>(exclude Service)</i></span></p>
+                      <p><strong class="text-info">{{ __('Down Payment') }}</strong>: <span class="text-danger">{{ format_price($booking->amount * 0.5) }}</span></p>
                       <p><strong>{{ __('Total Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->amount) }}</span></p>
                       @if($booking->payment->dp_amount > 0)
                       <p><strong>{{ __('Paid DP Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->payment->dp_amount) }}</span></p>

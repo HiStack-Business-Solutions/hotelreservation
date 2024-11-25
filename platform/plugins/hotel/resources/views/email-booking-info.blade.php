@@ -206,17 +206,14 @@
                       @endif
                       <br>
                       <p><strong>{{ __('Discount') }}</strong>: <span class="text-danger">{{ $booking->discount}}% <i>(exclude Service)</i></span></p>
-                      <p><strong>{{ __('Total Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->amount) }}</span></p>
-                      <p><strong>{{ __('Payment method') }}</strong>: {{ $booking->payment->id ? $booking->payment->payment_channel->label() : 'N/A' }}</p>
                       @if(str_contains($booking->payment->payment_channel->label(), 'Down Payment'))
                       @php
                         $timeIn60Minutes = \Carbon\Carbon::now()->addMinutes(60)->format('Y-m-d H:i:s');
                       @endphp
-                        <p>
-                            <strong>{{ __('Total Down Payment') }}</strong>: {{ format_price($booking->amount * 0.5) }} - 
-                            <i><strong> Please paid before {{ $timeIn60Minutes }} </strong></i>
-                        </p>
+                      <p><strong class="text-info">{{ __('Down Payment') }}</strong>: <span class="text-danger">{{ format_price($booking->amount * 0.5) }}</span></p>
                       @endif
+                      <p><strong>{{ __('Total Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->amount) }}</span></p>
+                      <p><strong>{{ __('Payment method') }}</strong>: {{ $booking->payment->id ? $booking->payment->payment_channel->label() : 'N/A' }}</p>
                   </div>
                   <p><strong>{{ __('Payment status') }}</strong>: {!! $booking->payment->id ? $booking->payment->status->toHtml() : \Botble\Payment\Enums\PaymentStatusEnum::PENDING()->toHtml() !!}</p>
                   

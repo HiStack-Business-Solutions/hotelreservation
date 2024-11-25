@@ -293,7 +293,7 @@
                                                    value="down_payment" data-toggle="collapse" data-target=".payment_bank_transfer_wrap" data-parent=".list_payment_method">
                                             <label for="payment_bank_transfer" class="text-left">{{ setting('payment_bank_transfer_name', trans('plugins/payment::payment.payment_via_bank_transfer')) }}</label>
                                             <div class="payment_bank_transfer_wrap payment_collapse_wrap collapse @if (setting('default_payment_method') == \Botble\Payment\Enums\PaymentMethodEnum::BANK_TRANSFER) show @endif" style="padding: 15px 0;">
-                                                {!! clean(setting('payment_bank_transfer_description')) !!}, and please payment {{ format_price($total * 0.5) }} (50% from total)
+                                                {!! clean(setting('down_payment_description')) !!}: {{ format_price($total * 0.5) }} from total
                                             </div>
                                         </li>
                                     @endif

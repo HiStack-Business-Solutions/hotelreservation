@@ -82,16 +82,13 @@
         @endif
         <br>
         <p><strong>{{ __('Discount') }}</strong>: <span class="text-danger">{{ $booking->discount}}% <i>(exclude Service)</i></span></p>
+        @if ($booking->payment->payment_channel == 'down_payment') 
+        <p><strong class="text-info">{{ __('Down Payment Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->amount * 0.5) }}</span></p>
+        @endif
         <p><strong>{{ __('Total Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->amount) }}</span></p>
         @if($booking->payment->dp_amount > 0)
         <p><strong>{{ __('Paid DP Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->payment->dp_amount) }}</span></p>
         <p><strong>{{ __('Remaining Amount') }}</strong>: <span class="text-danger">{{ format_price($booking->amount - $booking->payment->dp_amount) }}</span></p>
-        @endif
-
-        @if(str_contains($booking->payment->payment_channel->label(), 'Down Payment'))
-                          <p>
-                              <strong>{{ __('Total Down Payment') }}</strong>: <span class="text-danger"> {{ format_price($booking->amount * 0.5) }} </span>
-                          </p>
         @endif
 
         <p><strong>{{ __('Payment method') }}</strong>: {{ $booking->payment->id ? $booking->payment->payment_channel->label() : 'N/A' }}</p>

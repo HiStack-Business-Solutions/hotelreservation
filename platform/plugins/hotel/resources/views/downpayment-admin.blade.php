@@ -2,6 +2,8 @@
     $booking = $options['booking'];
 @endphp
 <script>
+    
+    $('#is_manual_input').on('input', onManualInputCheck);
     function onStatusSelect() {
         const PROCESSING = "{{\Botble\Hotel\Enums\BookingStatusEnum::PROCESSING()}}";
         if ($('select[name="status"]').find(':selected').val() == PROCESSING) {
@@ -20,6 +22,18 @@
         currencyInput.addEventListener('focus', onFocusDP);
         currencyInput.addEventListener('blur', onBlurDP);
         currencyInput.addEventListener('input', onChangeDP);
+        let manualInputCheckbox = $('#is_manual_input');
+        manualInputCheckbox.on('input', onManualInputCheck);
+        manualInputCheckbox.attr("disabled", false);
+    }
+    function onManualInputCheck() {
+        let isManualInput = $('#is_manual_input').get(0).checked;
+        $('#dp_amount_visible').attr('disabled', !isManualInput);
+        if (!isManualInput) {
+            var currencyInput = document.querySelector('#dp_amount_visible');
+            currencyInput.value = "{{($booking->payment->dp_amount > 0 ? $booking->payment->dp_amount : $booking->amount)}}";
+            onBlurDP({target:currencyInput});
+        }
     }
     function onFocusDP(e){
         var value = e.target.value;
@@ -62,5 +76,12 @@
     const decimalRegex = new RegExp('\\' + decimalSeparator, 'g');
     document.addEventListener('DOMContentLoaded',init,false);
 </script>
-<input class="form-control" placeholder="Down Payment" name="dp_amount_visible" type="currency" value="{{$booking->payment->dp_amount}}" id="dp_amount_visible" min="0" max="{{$booking->payment->amount}}">
+<hr/>
+<input id="is_manual_input" disabled="true" type="checkbox" placeholder="Manual Input" value="false" />
+<label for="is_manual_input">Manual Input</label>
+<hr/>
+<div class="row p-2">
+    <span class="text-info col-sm justify-content-center align-self-center"><strong>Nilai Down Payment</strong></span>
+    <input class="col-sm-6 form-control" placeholder="Down Payment" disabled="true" name="dp_amount_visible" type="currency" value="{{($booking->payment->dp_amount > 0 ? $booking->payment->dp_amount : $booking->amount)}}" id="dp_amount_visible" min="0" max="{{$booking->payment->amount}}">
+</div>
 <input hidden name="dp_amount" type="currency" value="0" id="dp_amount" min="0" max="{{$booking->payment->amount}}">
