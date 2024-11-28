@@ -216,7 +216,8 @@
                       <p><strong>{{ __('Payment method') }}</strong>: {{ $booking->payment->id ? $booking->payment->payment_channel->label() : 'N/A' }}</p>
                   </div>
                   <p><strong>{{ __('Payment status') }}</strong>: {!! $booking->payment->id ? $booking->payment->status->toHtml() : \Botble\Payment\Enums\PaymentStatusEnum::PENDING()->toHtml() !!}</p>
-                  
+                  <p class="font-italic"><strong>Please pay before: <span class="text-danger">{{$booking->getPaymentTimeAtLast()}}</span></strong></p>
+                  <hr/>
                   <p style="font-family: Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">{!! clean(theme_option('payment_description')) !!}.</p>
                   <p style="font-family: Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">If you have any questions or need to make changes to your reservation, please do not hesitate to contact us at [Contact Information].</p>
                   <p style="font-family: Helvetica, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">We look forward to welcoming you to Natura Ecopark and hope you have a pleasant stay.</p>

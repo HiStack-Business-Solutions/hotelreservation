@@ -3,10 +3,12 @@
 namespace Botble\Hotel\Mails;
 
 use Botble\Hotel\Enums\BookingStatusEnum;
+use Botble\Hotel\Models\Booking;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 
 class BookingMailer
 {
@@ -24,6 +26,30 @@ class BookingMailer
     {
         Mail::to($booking->address->email)
             ->send(new DownPaymentMail($booking));
+    }
+    public static function sendBookingCancelEmail(Booking $booking, string $reason) 
+    {
+        Mail::to($booking->address->email)
+            ->send(new BookingCancelMail($booking, $reason));
+    }
+}
+class BookingCancelMail extends Mailable
+{
+    use Queueable, SerializesModels;
+
+    public $booking;
+    public $cancelReason;
+
+    public function __construct(Booking $booking, string $reason)
+    {
+        $this->booking = $booking;
+        $this->cancelReason = $reason;
+    }
+
+    public function build()
+    {
+        return $this->view('plugins/hotel::email-booking-cancel', ['booking' => $this->booking, 'cancelReason' => $this->cancelReason])
+            ->subject('Booking Cancelled due to Payment Timeout - Transaction #' . $this->booking->transaction_id);
     }
 }
 class DownPaymentMail extends Mailable

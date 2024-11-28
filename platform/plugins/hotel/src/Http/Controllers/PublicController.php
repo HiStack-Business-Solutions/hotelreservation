@@ -4,6 +4,7 @@ namespace Botble\Hotel\Http\Controllers;
 
 use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Http\Responses\BaseHttpResponse;
+use Botble\Hotel\Enums\BookingStatusEnum;
 use Botble\Hotel\Http\Requests\CheckoutRequest;
 use Botble\Hotel\Mails\BookingMailer;
 use Botble\Hotel\Models\Booking;
@@ -31,6 +32,7 @@ use Carbon\Carbon;
 use DateTime;
 use EmailHandler;
 use Exception;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Arr;
@@ -126,13 +128,6 @@ class PublicController extends Controller
             'category'   => $request->input('category', empty($categories) ? 0 : $categories[0]->id)
         ];
 
-        // Change requirement: always return rooms
-        // $rooms = [];
-        // foreach ($allRooms as $allRoom) {
-        //     if ($allRoom->isAvailableAt($condition)) {
-        //         $rooms[] = $allRoom;
-        //     }
-        // }
         $rooms = $allRooms->all();
 
         $categories = $roomCategoryRepository->getModel()->all();
@@ -693,6 +688,21 @@ class PublicController extends Controller
         }
 
         $bookingService->processBooking($booking->id, $paymentData['charge_id']);
+
+        // schedule buat booking payment supaya kalo timeout kita cancel
+        $schedule = new Schedule('UTC');
+        $schedule->Call(function () {
+            $durationInHours = 1;
+            $thresholdTime = Carbon::now('UTC')->subHours($durationInHours);
+
+            $query = Booking::where('created_at', '<=', $thresholdTime)
+                ->where('status', '!=', BookingStatusEnum::CANCELLED());    
+            $query->update(['status' => BookingStatusEnum::CANCELLED()]);
+            $bookings = $query->get();
+            foreach($bookings as $b) {
+                BookingMailer::sendBookingCancelEmail($b, "the payment due is timeout.");
+            }
+        })->date('')->withoutOverlapping();
 
         if ($request->input('token')) {
             session()->forget($request->input('token'));

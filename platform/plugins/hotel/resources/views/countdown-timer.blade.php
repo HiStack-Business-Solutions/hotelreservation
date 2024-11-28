@@ -9,29 +9,62 @@ $(document).ready(()=> {
     
     // Create Countdown
     var Countdown = {
-    
         // Backbone-like structure
         $el: $('.countdown'),
         
         // Params
+        fromDate: new Date('{{$timerDate}}'),
+        hoursDuration: Number('{{$timerHours}}'),
         countdown_interval: null,
         total_seconds     : 0,
+
+        // kalkulasi tanggal countdown
+        calculateRemaining: function() {
+            let targetDate = new Date(this.fromDate);
+            targetDate.setHours(targetDate.getHours() + this.hoursDuration);
+
+            // Get the current time in UTC
+            let now = new Date();
+
+            // Calculate the difference in milliseconds
+            let diff = targetDate - now;
+
+            // Initialize remaining time components
+            let remainingHours = 0;
+            let remainingMinutes = 0;
+            let remainingSeconds = 0;
+
+            // If the time difference is positive, calculate hours, minutes, and seconds
+            if (diff > 0) {
+                let totalSeconds = Math.floor(diff / 1000); // Total seconds remaining
+                remainingHours = Math.floor(totalSeconds / 3600); // Calculate hours
+                let remainingAfterHours = totalSeconds % 3600; // Remaining seconds after hours
+                remainingMinutes = Math.floor(remainingAfterHours / 60); // Calculate minutes
+                remainingSeconds = remainingAfterHours % 60; // Remaining seconds
+            }
+            return {
+                hours: remainingHours,
+                minutes: remainingMinutes,
+                seconds: remainingSeconds
+            };
+        },
         
         // Initialize the countdown  
         init: function() {
             
             // DOM
             this.$ = {
-            hours  : this.$el.find('.bloc-time.hours .figure'),
-            minutes: this.$el.find('.bloc-time.min .figure'),
-            seconds: this.$el.find('.bloc-time.sec .figure')
+                hours  : this.$el.find('.bloc-time.hours .figure'),
+                minutes: this.$el.find('.bloc-time.min .figure'),
+                seconds: this.$el.find('.bloc-time.sec .figure')
             };
 
             // Init countdown values
+            let remainings = this.calculateRemaining();
             this.values = {
-                hours  : this.$.hours.parent().attr('data-init-value'),
-                minutes: this.$.minutes.parent().attr('data-init-value'),
-                seconds: this.$.seconds.parent().attr('data-init-value'),
+                hours  : remainings.hours,
+                minutes: remainings.minutes,
+                seconds: remainings.seconds,
             };
             
             // Initialize total seconds
@@ -194,7 +227,6 @@ $(document).ready(()=> {
 
     .countdown {
         width: 720px;
-        margin: 0 auto;
     }
 
     .countdown .bloc-time {
@@ -343,35 +375,35 @@ $(document).ready(()=> {
         margin: auto;
     }
 </style>
-<div class="d-flex p-5">
-    <div class="countdown">
-        <div class="bloc-time hours" data-init-value="24">
+<div class="d-flex p-4">
+    <div class="countdown mx-2">
+        <div class="bloc-time hours">
             <span class="count-title">Hours</span>
 
             <div class="figure hours hours-1">
-                <span class="top">2</span>
+                <span class="top">0</span>
                 <span class="top-back">
                     <span>2</span>
                 </span>
-                <span class="bottom">2</span>
+                <span class="bottom">0</span>
                 <span class="bottom-back">
                     <span>2</span>
                 </span>
             </div>
 
             <div class="figure hours hours-2">
-                <span class="top">4</span>
+                <span class="top">0</span>
                 <span class="top-back">
                     <span>4</span>
                 </span>
-                <span class="bottom">4</span>
+                <span class="bottom">0</span>
                 <span class="bottom-back">
                     <span>4</span>
                 </span>
             </div>
         </div>
 
-        <div class="bloc-time min" data-init-value="0">
+        <div class="bloc-time min">
             <span class="count-title">Minutes</span>
 
             <div class="figure min min-1">
@@ -397,7 +429,7 @@ $(document).ready(()=> {
             </div>
         </div>
 
-        <div class="bloc-time sec" data-init-value="0">
+        <div class="bloc-time sec">
             <span class="count-title">Seconds</span>
 
             <div class="figure sec sec-1">

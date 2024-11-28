@@ -96,7 +96,8 @@
     <p><strong>{{ __('Payment status') }}</strong>: <a @if(Auth::check()) href="{{route('payment.show', $booking->payment->id)}}"@endif>{!! $booking->payment->id ? $booking->payment->status->toHtml() : \Botble\Payment\Enums\PaymentStatusEnum::PENDING()->toHtml() !!}</a></p>
     
     <div>
-        @include('plugins/hotel::countdown-timer', compact('booking'))
+        <span><strong>Remaining time for payment due:</strong></span>
+        @include('plugins/hotel::countdown-timer', ['timerDate' => $booking->createdAtUTCStr(), 'timerHours' => 1])
     </div>
     <div style="display: flex; justify-content: flex-end;">
         <button onclick="printDiv('printableArea')" style="background-color: #007bff; color: white; border: none; padding: 8px 20px; border-radius: 5px; display: flex; align-items: center; margin-right: 10px;">
@@ -106,7 +107,7 @@
             <i class="fa fa-file-alt" aria-hidden="true" style="margin-right: 5px;"></i> Thermal Print Preview
         </button>
     </div>
-    @if($showUploadForm)
+    @if($showUploadForm && !$booking->isCountdownTimeout())
     <form action="{{ route('public.booking.storePaymentProof') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="form-group">
