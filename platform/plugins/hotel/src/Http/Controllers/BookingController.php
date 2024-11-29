@@ -77,6 +77,9 @@ class BookingController extends BaseController
         
     }
     private function getIDRAmount(string $value) {
+        if (!$value) {
+            return 0;
+        }
         $formatter = new NumberFormatter('en', NumberFormatter::CURRENCY);
 
         // Format the number to get the thousand separator
@@ -127,7 +130,9 @@ class BookingController extends BaseController
                 ->setError(true)
                 ->setMessage('Perlu Bukti Transfer DP');
         }
-        $dp_amount = $this->getIDRAmount($request->input('dp_amount'));
+        $dp_amount_input = $request->input('dp_amount');
+        $dp_amount_input = $dp_amount_input ? $dp_amount_input : "0";
+        $dp_amount = $this->getIDRAmount($dp_amount_input);
         if ($dp_amount > $booking->payment->amount) {
             return $response
                 ->setError(true)
