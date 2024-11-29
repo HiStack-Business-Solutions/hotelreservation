@@ -28,8 +28,8 @@ class UpdateRecordStatus extends Command
 
         $query = Booking::where('created_at', '<=', $thresholdTime)
             ->where('status', BookingStatusEnum::PENDING());    
-        $query->update(['status' => BookingStatusEnum::CANCELLED()]);
-        $bookings = $query->get();
+        $query->clone()->update(['status' => BookingStatusEnum::CANCELLED()]);
+        $bookings = $query->clone()->get();
         foreach($bookings as $b) {
             BookingMailer::sendBookingCancelEmail($b, "the payment due is timeout.");
         }
