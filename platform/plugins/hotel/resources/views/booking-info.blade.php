@@ -107,7 +107,7 @@
             <i class="fa fa-file-alt" aria-hidden="true" style="margin-right: 5px;"></i> Thermal Print Preview
         </button>
     </div>
-    @if($showUploadForm && !$booking->isCountdownTimeout())
+    @if($showUploadForm && (!$booking->isCountdownTimeout() || !in_array($booking->status, ['pending', 'cancelled'])))
     <form action="{{ route('public.booking.storePaymentProof') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="form-group">

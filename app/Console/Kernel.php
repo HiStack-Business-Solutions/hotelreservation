@@ -2,8 +2,10 @@
 
 namespace App\Console;
 
+use App\Console\Commands\UpdateRecordStatus;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Log;
 
 class Kernel extends ConsoleKernel
 {
@@ -13,7 +15,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        UpdateRecordStatus::class
     ];
 
     /**
@@ -24,7 +26,15 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('update:record-status')
+            ->runInBackground()
+            ->withoutOverlapping()
+            ->everyFiveMinutes()
+            ->onFailure(function () {
+                Log::error('Booking Cancellation Scheduler failed to execute.');
+            });
+
+        Log::info('Booking Canceller schedule is running at: ' . now());
     }
 
     /**

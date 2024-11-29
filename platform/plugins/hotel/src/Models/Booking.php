@@ -99,7 +99,7 @@ class Booking extends BaseModel
     public function isCountdownTimeout($maximumHours = 1): bool {
         $createdDate = Carbon::instance($this->created_at);
         $lastPaymentDate = $createdDate->copy()->addHours($maximumHours);
-        return $lastPaymentDate->diffInSeconds(Carbon::now()) < 0;
+        return !Carbon::now('UTC')->lessThanOrEqualTo($lastPaymentDate);
         
     }
     public function getPaymentTimeAtLast(int $maxLastTimeHours = 1) {
