@@ -7,6 +7,7 @@ use Botble\Hotel\Mails\BookingMailer;
 use Botble\Hotel\Models\Booking;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Log;
 
 class UpdateRecordStatus extends Command
 {
@@ -35,7 +36,7 @@ class UpdateRecordStatus extends Command
         }
 
         if ($bookings->count() > 0) {
-            $this->info('Booking timeout cancelled successfully and emails were sent.');
+            Log::info('Booking timeout cancelled successfully and emails were sent.');
         }
     }
 }

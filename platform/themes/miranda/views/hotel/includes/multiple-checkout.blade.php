@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded',init,false);
     </div>
     @if($checkout)
     <div class="pb-20 pt-20 text-center" style="font-size: 30px; background-color: #151516;">
-        <p>{{ __('Total') }}: <span class="total-amount-text">@if($checkout){{ format_price($total) }} @else - @endif</span></p>
+        <p>{{ __('Total') }}: <span class="total-amount-text">@if($checkout){{ format_price($total) }} @else - @endif</span><span id="extra_bed_total_wrooms"></span></p>
     </div>
     @endif
     @if(!$checkout)

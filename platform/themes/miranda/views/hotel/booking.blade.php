@@ -199,7 +199,34 @@
                                 </div>
                                 <div class="form-group mb-20">
                                     <label for="requests">{{ __('Requests') }}</label>
+                                    
+                                    <div class="form-group mb-20 custom-checkbox">
+                                        <label for="has_extra_bed">
+                                        <input id="has_extra_bed" disabled="true" type="checkbox" placeholder="Has Extra Bed" value="false"/>
+                                            <input type="checkbox" class="service-item" id="has_extra_bed" value="false">
+                                            Need extra bed?
+                                            <span></span>
+                                        </label>
+                                    </div>
                                     <textarea name="note" rows="3" id="requests" placeholder="{{ __('Write Something') }}...">{{ old('note') }}</textarea>
+                                    
+                                    <div id="extra_bed_options" class="card m-2" style="display: none; width: 24rem;">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Extra Bed Request</h5>
+                                            <ul class="list-group list-group-flush card-text">
+                                                @foreach($rooms as $r)
+                                                    <li class="list-group-item">
+                                                        <label for="extra_bed_room_{{ $r->id }}">{{ $r->name }} <em>({{ format_price($r->extra_bed_price) }} per bed)</em></label>
+                                                        <input data-extra-bed-price="{{ $r->extra_bed_price }}" data-room-id="{{ $r->id }}" type="number" id="extra_bed_room_{{ $r->id }}" value="0" min="0" max="{{ $r->max_extra_beds * $roomBookings[$r->id]['number_of_rooms'] }}">
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                        <div class="card-footer text-muted">
+                                            Total: <span id="total_extra_bed_price" class="font-weight-bold" >{{ format_price(0) }}</span>
+                                        </div>
+                                    </div>
+                                    <span></span>
                                 </div>
 
                                 <div class="form-group mb-20">
@@ -347,7 +374,7 @@
                             </div>
                         </div>
                         <div class="pb-20 pt-20 text-center" style="font-size: 30px; background-color: #151516;">
-                            <p>{{ __('Total') }}: <span class="total-amount-text">{{ format_price($total) }}</span></p>
+                            <p>{{ __('Total') }}: <span class="total-amount-text">{{ format_price($total) }}</span><span id="extra_bed_total_wrooms"></span></p>
                         </div>
                     </div>
 
@@ -357,3 +384,51 @@
         </div>
     </div>
 </section>
+<script>
+    const IDRFormat = new Intl.NumberFormat('id', { style: 'currency', currency: 'IDR' });
+    const thousandSeparator = IDRFormat.format(11111).match(/(.)\d{3}/)[1];
+    const decimalSeparator = IDRFormat.format(1.1).match(/\d+(.)\d+$/)[1];
+    const thousandRegex = new RegExp('\\' + thousandSeparator, 'g');
+    const decimalRegex = new RegExp('\\' + decimalSeparator, 'g');
+
+    $('#has_extra_bed').on('input', onExtraBedCheck);
+    $('extra_bed_room_');
+    $(document).ready(()=>{
+        let hasExtraBedCheck = $('#has_extra_bed');
+        hasExtraBedCheck.on('input', onExtraBedCheck);
+        hasExtraBedCheck.attr("disabled", false);
+        
+        $('input[id^="extra_bed_room"]').on('input', onExtraBedChanges);
+    });
+    function onExtraBedChanges() {
+        let total = 0;
+        $('input[id^="extra_bed_room"]').get().forEach((el)=>{
+            let inel = $(el);
+            total += Number(inel.val()) * Number(inel.attr("data-extra-bed-price"));
+        });
+        let formatted = IDRFormat.format(total);
+        $("#total_extra_bed_price").text(formatted);
+        let finalFormatted = "";
+        if (total > 0) {
+            finalFormatted = `+ ${formatted} (extra bed)`;
+        }
+        $("#extra_bed_total_wrooms").text(finalFormatted);
+    }
+    function onExtraBedCheck() {
+        let el = $('#has_extra_bed');
+        let toShow = el.get(0).checked;
+        let extraBedInputs = $('input[id^="extra_bed_room"]');
+        if (toShow) {
+            $('#extra_bed_options').show();
+            extraBedInputs.get().forEach((e)=> {
+                let eli = $(e);
+                let id = eli.attr('data-room-id');
+                let name = `extra_bed_room[${id}]`;
+                eli.attr('name', name);
+            });
+        } else {
+            $('#extra_bed_options').hide();
+            extraBedInputs.removeAttr('name');
+        }
+    }
+</script>
