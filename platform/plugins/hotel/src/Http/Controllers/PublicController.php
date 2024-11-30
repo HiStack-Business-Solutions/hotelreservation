@@ -460,7 +460,19 @@ class PublicController extends Controller
         }
         
         $services = $serviceRepository->allBy(['status' => BaseStatusEnum::PUBLISHED]);
-        
+
+        $extraBeds = Arr::get($sessionData, 'extra_bed_room');
+        $extraBedTotal = 0.0;
+        if (!$extraBeds) {
+            $extraBeds = array();
+            foreach($rooms as $r)
+                $extraBeds[$r->id] = 0;
+        }
+        foreach($rooms as $r) {
+            $extraBedTotal += $extraBeds[$r->id] * $r->extra_bed_price;
+        }
+        $total += $extraBedTotal;
+
         return [
             'discount' => $discount,
             'discount_amount' => $discount_amount,
@@ -475,7 +487,8 @@ class PublicController extends Controller
             'total' => $total,
             'taxAmount' => $taxAmount,
             'multiBook' => $multiBook,
-            'roomBookings' => $roomBookings
+            'roomBookings' => $roomBookings,
+            'extraBeds' => $extraBeds
         ];
     }
     /**
@@ -598,7 +611,8 @@ class PublicController extends Controller
             'total' => $total,
             'taxAmount' => $taxAmount,
             'multiBook' => $multiBook,
-            'roomBookings' => $roomBookings
+            'roomBookings' => $roomBookings,
+            'extraBeds' => $extraBeds
         ] = $this->calculateBooking($request->except(['_token']), $serviceRepository, $roomRepository);
 
         $booking->amount = $total;
@@ -631,6 +645,7 @@ class PublicController extends Controller
                 'tax_amount'        => $roomBookings[$r->id]['taxAmount'],
                 'currency_id'       => $r->currency_id,
                 'number_of_rooms'   => $roomBookings[$r->id]['number_of_rooms'],
+                'extra_beds'        => $extraBeds[$r->id],
                 'start_date'        => $startDate->format('Y-m-d'),
                 'end_date'          => $endDate->format('Y-m-d'),
             ]);
