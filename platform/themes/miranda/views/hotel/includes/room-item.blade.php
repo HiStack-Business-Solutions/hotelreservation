@@ -62,7 +62,7 @@
         </br>
         <break class="mb-10"><a>Plus Extra Bed : </a>
             <a href="{{ $room->url }}">
-                {{ $room->max_extrabed }} Maximum
+                Maximum of {{ $room->max_extra_beds }}
             </a>
         </break>
         <p class="mb-10"><a>Discount : </a>

@@ -165,6 +165,30 @@ class RoomForm extends FormAbstract
                 ],
                 'default_value' => 0,
             ])
+            ->add('max_extra_beds', 'text', [
+                'label'         => trans('plugins/hotel::room.form.max_extra_beds'),
+                'label_attr'    => ['class' => 'control-label'],
+                'wrapper'       => [
+                    'class' => 'form-group col-md-3',
+                ],
+                'attr'          => [
+                    'id'          => 'max-extra-bed-number',
+                    'placeholder' => trans('plugins/hotel::room.form.max_extra_beds'),
+                    'class'       => 'form-control input-mask-number',
+                ]
+            ])
+            ->add('extra_bed_price', 'text', [
+                'label'      => trans('plugins/hotel::room.form.extra_bed_price'),
+                'label_attr' => ['class' => 'control-label'],
+                'wrapper'    => [
+                    'class' => 'form-group col-md-6',
+                ],
+                'attr'       => [
+                    'id'          => 'extra-bed-price-number',
+                    'placeholder' => trans('plugins/hotel::room.form.extra_bed_price'),
+                    'class'       => 'form-control input-mask-number',
+                ]
+            ])
             ->add('rowClose2', 'html', [
                 'html' => '</div>',
             ])
@@ -193,19 +217,6 @@ class RoomForm extends FormAbstract
                 'attr'          => [
                     'id'          => 'max-children-number',
                     'placeholder' => trans('plugins/hotel::room.form.max_children'),
-                    'class'       => 'form-control input-mask-number',
-                ],
-                'default_value' => 0,
-            ])
-            ->add('max_extrabed', 'text', [
-                'label'         => trans('plugins/hotel::room.form.max_extrabed'),
-                'label_attr'    => ['class' => 'control-label'],
-                'wrapper'       => [
-                    'class' => 'form-group col-md-3',
-                ],
-                'attr'          => [
-                    'id'          => 'max-children-number',
-                    'placeholder' => trans('plugins/hotel::room.form.max_extrabed'),
                     'class'       => 'form-control input-mask-number',
                 ],
                 'default_value' => 0,

@@ -645,7 +645,7 @@ class PublicController extends Controller
                 'tax_amount'        => $roomBookings[$r->id]['taxAmount'],
                 'currency_id'       => $r->currency_id,
                 'number_of_rooms'   => $roomBookings[$r->id]['number_of_rooms'],
-                'extra_beds'        => $extraBeds[$r->id],
+                'extra_beds'        => (int)$extraBeds[$r->id],
                 'start_date'        => $startDate->format('Y-m-d'),
                 'end_date'          => $endDate->format('Y-m-d'),
             ]);

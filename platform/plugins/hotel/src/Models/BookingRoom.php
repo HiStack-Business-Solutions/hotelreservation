@@ -31,6 +31,7 @@ class BookingRoom extends BaseModel
         'tax_amount',
         'currency_id',
         'number_of_rooms',
+        'extra_beds',
         'start_date',
         'end_date',
     ];
