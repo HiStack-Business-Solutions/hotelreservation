@@ -19,7 +19,7 @@
             <div class="icon"><i class="fal fa-calendar-alt"></i></div>
             <input type="text" placeholder="{{ request()->query('end_date', now()->addDay()->format('d-m-Y')) }}" value="{{ request()->query('end_date', now()->addDay()->format('d-m-Y')) }}" name="end_date" id="departure-date">
         </div>
-        <div class="input-group input-group-two left-icon mb-20">
+        <!-- <div class="input-group input-group-two left-icon mb-20">
             <label for="adults">{{ __('Guests') }}</label>
             <select name="adults" id="adults">
                 <option value="0" @if (request()->query('adults', 0) == 0) selected @endif>Any</option>
@@ -27,7 +27,12 @@
                     <option value="{{ $i }}" @if (request()->query('adults') == $i) selected @endif>{{ $i }} {{ $i == 1 ? __('Guest') : __('Guests') }}</option>
                 @endfor
             </select>
+        </div> -->
+        <div class="input-group input-group-two left-icon mb-20">
+            <label for="adults">{{ __('Guests') }}</label>
+            <input type="number" name="adults" id="adults" value="{{ request()->query('adults', 0) }}" min="0" step="1" placeholder="{{ __('Any') }}">
         </div>
+
         @if (!$availableForBooking && isset($categories) && !is_null($categories) && !empty($categories))
             <div class="input-group input-group-two left-icon mb-20">
                 <label for="category">{{ __('Room Category') }}</label>

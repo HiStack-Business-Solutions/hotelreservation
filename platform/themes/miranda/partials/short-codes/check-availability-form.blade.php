@@ -23,13 +23,17 @@
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-6">
-                                <div class="inputs-filed mt-30">
+                                <!-- <div class="inputs-filed mt-30">
                                     <label for="adults">{{ __('Guests') }}</label>
                                     <select name="adults" id="adults">
                                         @for($i = 1; $i <= 10; $i++)
                                             <option value="{{ $i }}" @if ($i ==  1) selected @endif>{{ $i }} {{ $i == 1 ? __('Guest') : __('Guests') }}</option>
                                         @endfor
                                     </select>
+                                </div> -->
+                                <div class="inputs-filed mt-30">
+                                    <label for="adults">{{ __('Guests') }}</label>
+                                    <input type="number" name="adults" id="adults" value="{{ request()->query('adults', 0) }}" min="0" step="1" placeholder="{{ __('Any') }}">
                                 </div>
                             </div>
 
