@@ -463,11 +463,12 @@ class PublicController extends Controller
 
         $extraBeds = Arr::get($sessionData, 'extra_bed_room');
         $extraBedTotal = 0.0;
-        if (!$extraBeds) {
+        if (empty($extraBeds)) {
             $extraBeds = array();
             foreach($rooms as $r)
                 $extraBeds[$r->id] = 0;
         }
+        
         foreach($rooms as $r) {
             $extraBedTotal += $extraBeds[$r->id] * $r->extra_bed_price;
         }
