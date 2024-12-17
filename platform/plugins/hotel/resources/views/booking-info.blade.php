@@ -94,8 +94,8 @@
         @endif
 
         <p><strong>{{ __('Payment method') }}</strong>: {{ $booking->payment->id ? $booking->payment->payment_channel->label() : 'N/A' }}</p>
+        <p><strong>{{ __('Payment status') }}</strong>: <a @if(Auth::check()) href="{{route('payment.show', $booking->payment->id)}}"@endif>{!! $booking->payment->id ? $booking->payment->status->toHtml() : \Botble\Payment\Enums\PaymentStatusEnum::PENDING()->toHtml() !!}</a></p>
     </div>
-    <p><strong>{{ __('Payment status') }}</strong>: <a @if(Auth::check()) href="{{route('payment.show', $booking->payment->id)}}"@endif>{!! $booking->payment->id ? $booking->payment->status->toHtml() : \Botble\Payment\Enums\PaymentStatusEnum::PENDING()->toHtml() !!}</a></p>
     
     <div>
         <span><strong>Remaining time for payment due:</strong></span>
