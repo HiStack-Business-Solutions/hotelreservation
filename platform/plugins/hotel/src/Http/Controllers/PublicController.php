@@ -468,7 +468,7 @@ class PublicController extends Controller
             foreach($rooms as $r)
                 $extraBeds[$r->id] = 0;
         }
-        
+
         foreach($rooms as $r) {
             $extraBedTotal += $extraBeds[$r->id] * $r->extra_bed_price;
         }
@@ -762,7 +762,10 @@ class PublicController extends Controller
 
         if (!$booking) {
             abort(404);
-        }        
+        }   
+        if ($booking->isCountdownTimeout()) {
+            abort(404, 'Masa payment telah berakhir, anda tetap bisa booking ulang.');
+        }
         $filename = $booking->id . '-' . $booking->transaction_id;
         $path = $file->storeAs('public/payment_proofs', $filename);
 
