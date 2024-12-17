@@ -6,6 +6,7 @@ use Botble\Hotel\Models\Room;
 use Botble\Support\Http\Requests\Request;
 use Exception;
 use Illuminate\Contracts\Validation\Rule;
+use Throwable;
 
 class CheckoutRequest extends Request
 {
@@ -81,7 +82,7 @@ class ExtraBedRule implements Rule
             $extraBeds = (array) $value;
             $ids = array_keys($extraBeds);
             $rooms = Room::whereIn('id', $ids)->get();
-            if ($rooms->count() != $value->count()) {
+            if (count($rooms) != count($value)) {
                 return false;
             }
             foreach($rooms as $r) {
@@ -94,7 +95,7 @@ class ExtraBedRule implements Rule
                     return false;
                 }
             }
-        } catch(Exception $e) {
+        } catch(Throwable $e) {
             return false;
         }
         
@@ -108,6 +109,6 @@ class ExtraBedRule implements Rule
      */
     public function message()
     {
-        return 'Extra bed tidak boleh melebihi jumlah maximum yang telah disediakan. ' . $this->roomFail . ' : ' . $this->roomNumFail . ' (max. of ' . $this->roomMaxFail . ')';
+        return 'Extra bed tidak boleh melebihi jumlah maximum yang telah disediakan. ' . $this->roomFail . ' : ' . $this->roomNumFail . ' beds (max. of ' . $this->roomMaxFail . ')';
     }
 }
