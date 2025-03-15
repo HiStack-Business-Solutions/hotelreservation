@@ -43,13 +43,39 @@ app()->booted(function () {
         Theme::asset()->usePath()->add('magnific-popup-css', 'css/magnific-popup.css');
         Theme::asset()->container('footer')->usePath()->add('jquery.magnific-popup', 'js/jquery.magnific-popup.min.js');
 
+        $videoUrl = $shortCode->video_url;
+        if ($videoUrl && str_contains(strtolower($videoUrl), 'youtube')) {
+            $videoId = null;
+            
+            // Parse the URL and query string
+            $urlParts = parse_url($videoUrl);
+            if (isset($urlParts['query'])) {
+                parse_str($urlParts['query'], $query);
+                if (isset($query['v'])) {
+                    $videoId = $query['v'];
+                }
+            } elseif (isset($urlParts['path'])) {
+                // Handle youtu.be format
+                $path = trim($urlParts['path'], '/');
+                if (str_contains($urlParts['host'] ?? '', 'youtu.be')) {
+                    $videoId = $path;
+                } elseif (str_contains($path, 'embed/')) {
+                    $videoId = str_replace('embed/', '', $path);
+                }
+            }
+            
+            if ($videoId) {
+                $videoUrl = 'https://www.youtube.com/watch?v=' . $videoId;
+            }
+        }
+
         return Theme::partial('short-codes.video-introduction', [
             'title'            => $shortCode->title,
             'sub_title'        => $shortCode->sub_title,
             'description'      => $shortCode->description,
             'background_image' => $shortCode->background_image,
             'video_image'      => $shortCode->video_image,
-            'video_url'        => $shortCode->video_url,
+            'video_url'        => $videoUrl,
             'button_text'      => $shortCode->button_text,
             'button_url'       => $shortCode->button_url,
         ]);

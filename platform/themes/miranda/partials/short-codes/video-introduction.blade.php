@@ -18,7 +18,7 @@
             <div class="col-lg-6 col-md-10 wow fadeInRight" data-wow-delay=".5s">
                 <div class="video-wrap" @if ($video_image) style="background-image: url({{ RvMedia::getImageUrl($video_image) }});" @endif>
                     @if ($video_url)
-                        <a href="{{ $video_url }}" class="popup-video"><i class="fas fa-play"></i></a>
+                        <a href="{{ $video_url }}" class="popup-video" data-iframe="true" data-iframe-attrs="allowfullscreen frameborder=0 referrerpolicy=strict-origin-when-cross-origin"><i class="fas fa-play"></i></a>
                     @endif
                 </div>
             </div>
