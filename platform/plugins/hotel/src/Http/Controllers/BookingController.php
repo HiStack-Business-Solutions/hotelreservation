@@ -195,17 +195,29 @@ class BookingController extends BaseController
             }
             $bookingRepository->update(['id'=> $booking->id], ['room_num_reduced' => true]);
         }
-
+        $emailNotification = null;
         try {
             if (!$booking->is_payment_emailed && $booking->status == BookingStatusEnum::LUNAS()) {
                 BookingMailer::sendFullPaymentEmail($booking);
                 $booking->is_payment_emailed = true;
                 $bookingRepository->update(['id'=> $booking->id], ['is_payment_emailed' => true]);
+                
+                // Pass full payment email notification status
+                $emailNotification = [
+                    'type' => 'info',
+                    'message' => 'Full payment confirmation email has been sent to ' . $booking->address->email
+                ];
             }
             if (!$booking->is_dp_payment_emailed && $booking->payment->payment_channel == 'down_payment' && $booking->status == BookingStatusEnum::PROCESSING()) {
                 BookingMailer::sendDownPaymentEmail($booking);
                 $booking->is_dp_payment_emailed = true;
                 $bookingRepository->update(['id'=> $booking->id], ['is_dp_payment_emailed' => true]);
+                
+                // Pass down payment email notification status
+                $emailNotification = [
+                    'type' => 'info',
+                    'message' => 'Down payment confirmation email has been sent to ' . $booking->address->email
+                ];
             }
         } catch (Exception $err) {
             Log::error($err);
@@ -215,7 +227,8 @@ class BookingController extends BaseController
 
         return $response
             ->setPreviousUrl(route('booking.index'))
-            ->setMessage(trans('core/base::notices.update_success_message'));
+            ->setMessage(trans('core/base::notices.update_success_message') . ($emailNotification ? '. ' . $emailNotification['message'] : ''))
+            ->setData(['emailNotification' => $emailNotification ?? null]);
     }
 
     /**

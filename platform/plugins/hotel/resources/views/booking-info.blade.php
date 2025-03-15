@@ -1,4 +1,12 @@
 @if ($booking)
+    @if (isset($emailNotification))
+        <div class="quote-info {{ $emailNotification['type'] }}">
+            <blockquote>
+            <i class="fas fa-info-circle"></i>
+                {{ $emailNotification['message'] }}
+            </blockquote>
+        </div>
+    @endif
     <div id="printableArea">
         <center>
             <div class="justify-content-center">

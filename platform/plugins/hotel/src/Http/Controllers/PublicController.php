@@ -726,11 +726,18 @@ class PublicController extends Controller
         if (!$booking) {
             abort(404);
         }
+        $emailNotification = null;
         try {
             if (!$booking->is_order_emailed) {
                 BookingMailer::sendBookingInfoEmail($booking);
                 $booking->is_order_emailed = true;
                 $bookingRepository->update(['id'=> $booking->id], ['is_order_emailed' => true]);
+                
+                // Pass email notification status to view
+                $emailNotification = [
+                    'type' => 'info',
+                    'message' => 'A booking confirmation email has been sent to ' . $booking->address->email
+                ];
             }
         } catch (Exception $err) {
             Log::error($err);
@@ -744,7 +751,7 @@ class PublicController extends Controller
         $fileName = $booking->id . '-' . $booking->transaction_id;
         $fileExists = Storage::exists('public/payment_proofs/' . $fileName);
         $showUploadForm = true;
-        return Theme::scope('hotel.booking-information', compact('booking', 'fileExists', 'fileName', 'showUploadForm'))->render();
+        return Theme::scope('hotel.booking-information', compact('booking', 'fileExists', 'fileName', 'showUploadForm', 'emailNotification'))->render();
     }
 
     public function storePaymentProof(Request $request, BookingInterface $bookingRepository)

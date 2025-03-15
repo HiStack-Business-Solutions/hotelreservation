@@ -24,3 +24,9 @@ RvMedia::addSize('380x280', 380, 280)
     ->addSize('770x460', 770, 460)
     ->addSize('550x580', 550, 580)
     ->addSize('1170x570', 1170, 570);
+
+add_action(BASE_ACTION_ENQUEUE_SCRIPTS, function () {
+    if (Route::currentRouteName() == 'public.booking.information' || Route::currentRouteName() == 'booking.edit') {
+        Theme::asset()->add('quote-notifications-css', 'css/quote-notifications.css');
+    }
+}, 120);

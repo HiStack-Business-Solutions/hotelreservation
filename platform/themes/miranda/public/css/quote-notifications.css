@@ -1,0 +1,32 @@
+.quote-info {
+    margin: 20px 0;
+    padding: 15px 20px;
+    border-left: 4px solid;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: flex-start;
+}
+
+.quote-info.info {
+    border-color: #17a2b8;
+    background-color: #e3f4f6;
+}
+
+.quote-info.warning {
+    border-color: #ffc107;
+    background-color: #fff3cd;
+}
+
+.quote-info i {
+    margin-right: 10px;
+    color: #666;
+    margin-top: 3px;
+}
+
+.quote-info blockquote {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    border: none;
+    font-style: normal;
+} 
