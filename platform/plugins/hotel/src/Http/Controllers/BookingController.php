@@ -179,7 +179,7 @@ class BookingController extends BaseController
                         $roomDate->room_id = $id;
                         $room = $bRoom->room;
                         $roomDate->price = $room->price;
-                        $roomDate->discount = $room->discount ? $room->discount : 0;
+                        $roomDate->discount = $room->discount ? $room->discount : 0.0;
                         $roomDate->number_of_rooms = $room->number_of_rooms;
                         $roomDate->active = true;
                         $roomDate->start_date = date('Y-m-d H:i:s', $i);
@@ -187,7 +187,7 @@ class BookingController extends BaseController
                     }
                     
                     $roomDate->number_of_rooms -= $bRoom->number_of_rooms;
-                    $roomDate->note_to_admin .= "\n Automatic pengurangan total room yang tersedia dari transaction ID #" . $booking->transaction_id . ".";
+                    $roomDate->note_to_admin .= "\n Pengurangan total room terotomatis yang diterapkan dari transaction ID #" . $booking->transaction_id . ".";
         
                     $roomDate = $roomDateRepository->createOrUpdate($roomDate);
                     $updated[$roomDate->id] = true;
